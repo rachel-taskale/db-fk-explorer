@@ -9,13 +9,19 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/react": "^3.21.0",
+    "@emotion/react": "^11.14.0",
     "@prisma/client": "^6.9.0",
+    "@xyflow/react": "^12.7.0",
     "axios": "^1.9.0",
     "cors": "^2.8.5",
     "next": "15.3.3",
+    "next-themes": "^0.4.6",
+    "pg": "^8.16.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-flow": "^1.0.3",
+    "react-icons": "^5.5.0",
     "ts-node-dev": "^2.0.0"
   },
   "devDependencies": {
@@ -23,10 +29,12 @@
     "@tailwindcss/postcss": "^4",
     "@types/cors": "^2.8.19",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/pg": "^8.15.4",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
+    "mini-css-extract-plugin": "^2.9.2",
     "prisma": "^6.9.0",
     "tailwindcss": "^4",
     "typescript": "^5.8.3"
