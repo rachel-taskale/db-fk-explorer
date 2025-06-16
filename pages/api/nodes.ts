@@ -7,16 +7,6 @@ async function get(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).json(nodes);
 }
 
-async function post(req: NextApiRequest, res: NextApiResponse) {
-  const { label } = req.body;
-  if (!label) {
-    return res.status(400).json({ error: "Missing 'label' in request body" });
-  }
-
-  const node = await prisma.artist.create({ data: { label } });
-  return res.status(201).json(node);
-}
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -26,7 +16,7 @@ export default async function handler(
       case "GET":
         return await get(req, res);
       case "POST":
-        return await post(req, res);
+        console.log("TODO: implement post");
       default:
         return res.setHeader("Allow", ["GET", "POST"]).status(405).end();
     }
