@@ -28,42 +28,45 @@ export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
   const nodeTypes = useMemo(() => ({ tableNode: TableNode }), []);
 
   const nodes: Node[] = useMemo(() => {
-    return tableData.map((table) => {
-      const seed = pseudoRandom(table.tableName);
+    return tableData.map((table, index) => {
+      const col = index % 3;
+      const row = Math.floor(index / 3);
+
+      const offset = pseudoRandom(table.tableName) % 10;
+
       return {
         id: table.tableName,
-      type: "tableNode",
+        type: "tableNode",
         position: {
-          x: (seed * 17) % 800,
-          y: (seed * 31) % 600,
+          x: 100 + col * 300 + offset,
+          y: 100 + row * 200 + offset,
         },
-      data: {
+        data: {
           name: table.tableName,
           fields: Array.from(Object.keys(table.fields)),
-      },
+        },
       };
     });
   }, [tableData]);
 
+  console.log(nodes);
+
   const edges = useMemo(() => {
-    const edges = [];
-    for (const table of tables) {
-      for (const fk of table.foreignKeys) {
-        edges.push({
-          id: `${table.id}-${fk.references}`,
-          source: table.id,
-          sourceHandle: `${fk.field}-source`,
-          target: fk.references,
-          targetHandle: `id-target`, // assumes FK always targets "id"
-          animated: true,
-        });
-      }
-    }
-    return edges;
-  }, []);
+    return tableData.flatMap((table) =>
+      table.foreignKeys.map((fk) => ({
+        id: `${table.tableName}-${fk.toTable}-${fk.fromColumn}`,
+        source: table.tableName,
+        sourceHandle: `${fk.fromColumn}-source`,
+        target: fk.toTable,
+        targetHandle: `${fk.toColumn}-target`,
+        animated: true, // optional for nicer UX
+        style: { stroke: "#555" },
+      }))
+    );
+  }, [tableData]);
 
   return (
-    <Box style={{ width: "100vh", height: "50vh" }}>
+    <Box style={{ width: "100rem", height: "50rem" }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}

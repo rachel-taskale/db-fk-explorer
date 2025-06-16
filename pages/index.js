@@ -32,7 +32,7 @@ export default function Home() {
     >
       <Box
         mt="25vh"
-        width="100vh"
+        width="100rem"
         backgroundColor={backgroundColor}
         color={primaryText}
         display="inline-block"
@@ -80,7 +80,9 @@ export default function Home() {
         </div>
       </Box>
       {tableData && (
-        <div style={{ width: "150vh", marginTop: 50 }}>
+        <div
+          style={{ width: "100rem", marginTop: 50, border: "1px solid white" }}
+        >
           <Heading size="2xl">TableFlow</Heading>
 
           <TableFlow tableData={tableData} />
