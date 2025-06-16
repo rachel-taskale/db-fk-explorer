@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import { ReactFlow, Background } from "@xyflow/react";
+import { ReactFlow, Background, Node } from "@xyflow/react";
 import { css } from "@emotion/react";
 import { Box, Heading, Button, Input, Text } from "@chakra-ui/react";
-
-import TableNode from "./tableNode";
+import { TableSchema } from "../common/interfaces";
 
 import "@xyflow/react/dist/style.css";
+import { TableNode } from "./tableNode";
 const nodeStyle = css`
   .dark & {
     background: #777;
@@ -17,40 +17,33 @@ const nodeStyle = css`
   }
 `;
 
-export const tables = [
-  {
-    id: "users",
-    name: "Users",
-    fields: ["id", "name", "email", "role_id"],
-    foreignKeys: [{ field: "role_id", references: "roles" }],
-  },
-  {
-    id: "roles",
-    name: "Roles",
-    fields: ["id", "role_name"],
-    foreignKeys: [],
-  },
-];
-const initialNodes = [
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
-  { id: "2", position: { x: 0, y: 100 }, data: { label: "2" } },
-];
-const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
+interface TableFlowProps {
+  tableData: TableSchema[];
+}
 
-export const TableFlow = () => {
+const pseudoRandom = (str: string) =>
+  str.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
   const nodeTypes = useMemo(() => ({ tableNode: TableNode }), []);
 
-  const nodes = useMemo(() => {
-    return tables.map((table, index) => ({
-      id: table.id,
+  const nodes: Node[] = useMemo(() => {
+    return tableData.map((table) => {
+      const seed = pseudoRandom(table.tableName);
+      return {
+        id: table.tableName,
       type: "tableNode",
-      position: { x: 100 + index * 300, y: 100 },
+        position: {
+          x: (seed * 17) % 800,
+          y: (seed * 31) % 600,
+        },
       data: {
-        name: table.name,
-        fields: table.fields,
+          name: table.tableName,
+          fields: Array.from(Object.keys(table.fields)),
       },
-    }));
-  }, []);
+      };
+    });
+  }, [tableData]);
 
   const edges = useMemo(() => {
     const edges = [];
