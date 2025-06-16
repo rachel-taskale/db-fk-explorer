@@ -6,6 +6,6 @@ export interface ForeignKeyReference {
 
 export interface TableSchema {
   tableName: string;
-  fields: Map<string, string>;
+  fields: { [key: string]: string };
   foreignKeys: ForeignKeyReference[];
 }

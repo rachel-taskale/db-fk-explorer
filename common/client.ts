@@ -11,6 +11,7 @@ export default async function createDBClient(dbURI: string) {
   } catch (err) {
     console.error("Connection error:", err);
   }
+  return client;
 }
 
 export async function testDBClientConnection(dbURI: string) {
@@ -23,7 +24,6 @@ export async function testDBClientConnection(dbURI: string) {
     FROM information_schema.tables
     WHERE table_type = 'BASE TABLE'
       AND table_schema NOT IN ('pg_catalog', 'information_schema');`);
-    console.log("===========here: ", res.rows[0]);
     return res.rows[0];
   } catch (err) {
     console.error("Connection error:", err);

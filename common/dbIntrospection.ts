@@ -47,18 +47,17 @@ export default async function introspectDB(client: Client) {
   const metadata: TableSchema[] = [];
   for (const row of tables.rows) {
     const { table_schema, table_name } = row;
-    console.log(`\n📦 Table: ${table_schema}.${table_name}`);
     const tableSchema: TableSchema = {
       tableName: table_name,
-      fields: new Map<string, string>(),
+      fields: {},
       foreignKeys: [],
     };
 
-    // Get columns for this table
     const columns = await client.query(columnQuery, [table_schema, table_name]);
-    let fields = new Map<string, string>();
+    const fields: { [key: string]: string } = {};
+
     for (const col of columns.rows) {
-      fields.set(col.column_name, col.data_type);
+      fields[col.column_name] = col.data_type;
     }
     tableSchema.fields = fields;
 
@@ -74,9 +73,6 @@ export default async function introspectDB(client: Client) {
           toTable: fk.foreign_table_name,
           toColumn: fk.foreign_column_name,
         });
-        console.log(
-          `    ${fk.column_name} → ${fk.foreign_table_schema}.${fk.foreign_table_name}(${fk.foreign_column_name})`
-        );
       }
     }
     tableSchema.foreignKeys = foreignKeys;

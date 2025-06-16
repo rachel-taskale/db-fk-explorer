@@ -1,8 +1,10 @@
 // pages/api/nodes.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import connectDBClient, { testDBClientConnection } from "../../common/client";
+import connectDBClient, {
+  testDBClientConnection,
+} from "../../../common/client";
 import dotenv from "dotenv";
-import createDBClient from "../../common/client";
+import createDBClient from "../../../common/client";
 import introspectDB from "@/common/dbIntrospection";
 dotenv.config();
 
@@ -29,7 +31,8 @@ export async function post(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).json({ message: "Cannot create DB client" });
     }
 
-    const data = await introspectDB(client); // you were missing `await` here!
+    const data = await introspectDB(client);
+
     await client.end();
 
     return res.status(200).json(data);
