@@ -1,7 +1,22 @@
 // pages/index.js
 import { Box, Heading, Button, Input, Text } from "@chakra-ui/react";
 import { TableFlow } from "../components/tableFlow";
+import Head from "next/head";
+import { useState } from "react";
+import axios from "axios";
 export default function Home() {
+  const [tableData, setTableData] = useState();
+  const [dbURI, setDbURI] = useState("");
+  const onSubmit = () => {
+    console.log(dbURI);
+    axios
+      .post("/api/nodes", { uri: dbURI })
+      .then((res) => {
+        console.log(res.data);
+        setTableData(res.data);
+      })
+      .catch((err) => console.error(err));
+  };
   const primaryText = "#F7FAFC";
   const secondaryText = "#444be5";
   const backgroundColor = "#141414";
@@ -15,18 +30,16 @@ export default function Home() {
       }}
     >
       <Box
-        m={40}
-        p={10}
-        border="1px solid #25324a"
-        borderRadius={20}
+        mt="25vh"
+        width="150vh"
         backgroundColor={backgroundColor}
         color={primaryText}
         display="inline-block"
         spaceY={10}
       >
         <div>
-          <Heading size="5xl">Database Intropection and Discovery</Heading>
-          <Heading size="xl" fontWeight="light" color="#CACBF9">
+          <Heading size="2xl">Database Intropection and Discovery</Heading>
+          <Heading size="lg" fontWeight="light" color="#CACBF9">
             Sed ut perspiciatis unde omnis iste natus error sit voluptatem
             accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
             quae ab illo inventore veritatis et quasi architecto beatae vitae
@@ -37,26 +50,38 @@ export default function Home() {
           </Heading>
         </div>
         <Input
-          size="2xl"
+          size="lg"
           variant="flushed"
           color={primaryText}
-          placeholder="Enter DB URI ex. postgresql://user:password@localhost:51214/chinook"
+          name="dbURI"
+          onChange={(e) => {
+            setDbURI(e.target.value);
+            console.log(e.target.value);
+          }}
+          placeholder="Enter DB URI e.g. postgresql://user:password@localhost:51214/chinook"
         />
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
+          }}
+        >
           <Button
-            mt={4}
-            size="2xl"
+            size="lg"
             backgroundColor={secondaryText}
             color={primaryText}
+            onClick={onSubmit}
           >
             Generate
           </Button>
         </div>
       </Box>
-      <div>
-        <Text>TableFlow</Text>
+      <div style={{ width: "150vh", marginTop: 50 }}>
+        <Heading size="2xl">TableFlow</Heading>
 
-        <TableFlow />
+        <TableFlow tableData={tableData} />
       </div>
     </div>
   );

@@ -1,19 +1,8 @@
+import { Client } from "pg";
 import connectDBClient, { testDBClientConnection } from "./client";
+import { TableSchema } from "./interfaces";
 
-interface ForeignKeyReference {
-  fromColumn: string;
-  toTable: string;
-  toColumn: string;
-}
-
-interface TableSchema {
-  tableName: string;
-  fields: Map<string, string>;
-  foreignKeys: ForeignKeyReference[];
-}
-
-async function introspect(dbURI: string) {
-  const client = connectDBClient(dbURI);
+export default async function introspectDB(client: Client) {
   if (!client) {
     return;
   }
@@ -51,11 +40,11 @@ async function introspect(dbURI: string) {
         AND tc.table_name = $2;
       `;
 
-  await client.connect();
+  client.connect();
 
   // Get tables
   const tables = await client.query(tableQuery);
-
+  const metadata: TableSchema[] = [];
   for (const row of tables.rows) {
     const { table_schema, table_name } = row;
     console.log(`\n📦 Table: ${table_schema}.${table_name}`);
@@ -90,7 +79,8 @@ async function introspect(dbURI: string) {
         );
       }
     }
+    tableSchema.foreignKeys = foreignKeys;
+    metadata.push(tableSchema);
   }
-
-  await client.end();
+  return metadata;
 }

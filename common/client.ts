@@ -1,11 +1,11 @@
 import { Client } from "pg";
 
-export default function createDBClient(dbURI: string) {
+export default async function createDBClient(dbURI: string) {
   const client = new Client({
     connectionString: dbURI,
   });
   try {
-    client.connect();
+    await client.connect();
     console.log("Successfully connected to database");
     return client;
   } catch (err) {
@@ -24,6 +24,7 @@ export async function testDBClientConnection(dbURI: string) {
     WHERE table_type = 'BASE TABLE'
       AND table_schema NOT IN ('pg_catalog', 'information_schema');`);
     console.log("===========here: ", res.rows[0]);
+    return res.rows[0];
   } catch (err) {
     console.error("Connection error:", err);
   } finally {
