@@ -3,6 +3,8 @@ import { Box, Heading, Button, Input, Text } from "@chakra-ui/react";
 import { TableFlow } from "../components/tableFlow";
 import Head from "next/head";
 import { useState } from "react";
+import { useRouter } from "next/router";
+
 import axios from "axios";
 export default function Home() {
   const [tableData, setTableData] = useState();
@@ -10,9 +12,8 @@ export default function Home() {
   const onSubmit = () => {
     console.log(dbURI);
     axios
-      .post("/api/nodes", { uri: dbURI })
+      .post("/api/table", { uri: dbURI })
       .then((res) => {
-        console.log(res.data);
         setTableData(res.data);
       })
       .catch((err) => console.error(err));
@@ -31,7 +32,7 @@ export default function Home() {
     >
       <Box
         mt="25vh"
-        width="150vh"
+        width="100vh"
         backgroundColor={backgroundColor}
         color={primaryText}
         display="inline-block"
@@ -78,11 +79,13 @@ export default function Home() {
           </Button>
         </div>
       </Box>
-      <div style={{ width: "150vh", marginTop: 50 }}>
-        <Heading size="2xl">TableFlow</Heading>
+      {tableData && (
+        <div style={{ width: "150vh", marginTop: 50 }}>
+          <Heading size="2xl">TableFlow</Heading>
 
-        <TableFlow tableData={tableData} />
-      </div>
+          <TableFlow tableData={tableData} />
+        </div>
+      )}
     </div>
   );
 }

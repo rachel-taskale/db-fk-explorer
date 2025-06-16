@@ -10,10 +10,6 @@ dotenv.config();
 
 export async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
-    if (req.method !== "POST") {
-      return res.status(405).json({ message: "Method Not Allowed" });
-    }
-
     const { dbURI } = req.body;
     const resolvedDbURI = dbURI ?? process.env.DATABASE_URL;
 
