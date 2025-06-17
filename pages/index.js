@@ -1,19 +1,30 @@
 // pages/index.js
-import { Box, Heading, Button, Input, Text } from "@chakra-ui/react";
-import { TableFlow } from "../components/tableFlow";
+import {
+  Box,
+  Heading,
+  Button,
+  Input,
+  Text,
+  Flex,
+  VStack,
+  Link,
+} from "@chakra-ui/react";
+import { TableFlow } from "../components/table/tableFlow";
 import Head from "next/head";
 import { useState } from "react";
 import { useRouter } from "next/router";
 
 import axios from "axios";
+import { Background } from "@xyflow/react";
 export default function Home() {
   const [tableData, setTableData] = useState();
   const [dbURI, setDbURI] = useState("");
   const onSubmit = () => {
-    console.log(dbURI);
+    console.log("onsubmit:", dbURI);
     axios
       .post("/api/table", { uri: dbURI })
       .then((res) => {
+        console.log(res.data);
         setTableData(res.data);
       })
       .catch((err) => console.error(err));
@@ -21,73 +32,111 @@ export default function Home() {
   const primaryText = "#F7FAFC";
   const secondaryText = "#444be5";
   const backgroundColor = "#141414";
+  const Sidebar = () => {
+    return (
+      <Flex height="80vh">
+        <Box color="white" p={4}>
+          <VStack align="start" spacing={10}>
+            <Heading size="xl">Database Intropection and Discovery</Heading>
+            <Heading
+              size="md"
+              fontWeight="light"
+              color="#CACBF9"
+              textWrap="wrap"
+            >
+              Sed ut perspiciatis unde omnis iste natus error sit voluptatem.
+            </Heading>
+            <Input
+              size="sm"
+              variant="flushed"
+              color={primaryText}
+              name="dbURI"
+              onChange={(e) => {
+                setDbURI(e.target.value);
+                console.log(e.target.value);
+              }}
+              placeholder="Enter DB URI e.g. postgresql://user:password@localhost:51214/chinook"
+            />
+
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "flex-end",
+                marginTop: "1rem",
+              }}
+            >
+              <Button
+                size="sm"
+                backgroundColor={secondaryText}
+                color={primaryText}
+                onClick={onSubmit}
+              >
+                Generate
+              </Button>
+            </div>
+          </VStack>
+        </Box>
+      </Flex>
+    );
+  };
   return (
     <div
       style={{
+        display: "flex", // 👈 side-by-side layout
         backgroundColor: "#141414",
-        height: "100rem",
-        justifyItems: "center",
-        // alignContent: "center",
+        height: "100vh", // full viewport height (instead of 100rem)
+        overflow: "hidden", // prevent outer scrollbars if unwanted
       }}
     >
-      <Box
-        mt="25vh"
-        width="100rem"
-        backgroundColor={backgroundColor}
-        color={primaryText}
-        display="inline-block"
-        spaceY={10}
+      {/* Sidebar */}
+      <div
+        style={{
+          marginTop: 20,
+          marginBottom: 20,
+          width: "33.3vh",
+          position: "fixed",
+          borderRadius: 20,
+          backgroundColor: "#F7FAFC05",
+          boxShadow: secondaryText,
+          border: ".5px solid #F7FAFC",
+        }}
       >
-        <div>
-          <Heading size="2xl">Database Intropection and Discovery</Heading>
-          <Heading size="lg" fontWeight="light" color="#CACBF9">
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-            accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-            quae ab illo inventore veritatis et quasi architecto beatae vitae
-            dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-            aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-            eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est,
-            qui dolorem ipsum quia dolor{" "}
-          </Heading>
-        </div>
-        <Input
-          size="lg"
-          variant="flushed"
-          color={primaryText}
-          name="dbURI"
-          onChange={(e) => {
-            setDbURI(e.target.value);
-            console.log(e.target.value);
-          }}
-          placeholder="Enter DB URI e.g. postgresql://user:password@localhost:51214/chinook"
-        />
+        <Sidebar />
+      </div>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginTop: "1rem",
-          }}
-        >
-          <Button
-            size="lg"
-            backgroundColor={secondaryText}
-            color={primaryText}
-            onClick={onSubmit}
-          >
-            Generate
-          </Button>
-        </div>
-      </Box>
-      {tableData && (
-        <div
-          style={{ width: "100rem", marginTop: 50, border: "1px solid white" }}
-        >
-          <Heading size="2xl">TableFlow</Heading>
-
-          <TableFlow tableData={tableData} />
-        </div>
-      )}
+      {/* Main content */}
+      <div
+        style={{
+          marginLeft: "33.3vh", // 👈 match sidebar width
+          padding: "1rem",
+          flexGrow: 1,
+          overflow: "auto",
+          height: "100vh",
+        }}
+      >
+        {tableData && (
+          <>
+            {/* <div
+              style={{
+                border: "1px solid white",
+                borderRadius: 5,
+                padding: "8px 4px 8px 4px ",
+                position: "fixed",
+                backgroundColor: "#141414",
+              }}
+            >
+              <Input
+                name="searchInput"
+                variant="flushed"
+                position="fixed"
+                color={primaryText}
+              />
+            </div> */}
+            <TableFlow tableData={tableData} />
+          </>
+        )}
+      </div>
     </div>
   );
 }
