@@ -13,7 +13,7 @@ import { TableFlow } from "../components/table/tableFlow";
 import Head from "next/head";
 import { useState } from "react";
 import { useRouter } from "next/router";
-
+import { primaryText, secondaryText } from "../common/styles";
 import axios from "axios";
 import { Background } from "@xyflow/react";
 export default function Home() {
@@ -29,12 +29,10 @@ export default function Home() {
       })
       .catch((err) => console.error(err));
   };
-  const primaryText = "#F7FAFC";
-  const secondaryText = "#444be5";
-  const backgroundColor = "#141414";
+
   const Sidebar = () => {
     return (
-      <Flex height="95vh">
+      <Flex height="90vh">
         <Box color="white" p={4}>
           <VStack align="start" spacing={10}>
             <Heading size="xl">Database Intropection and Discovery</Heading>
@@ -99,7 +97,7 @@ export default function Home() {
           borderRadius: 20,
           backgroundColor: "#F7FAFC05",
           boxShadow: secondaryText,
-          border: ".5px solid #F7FAFC",
+          border: `.5px solid ${primaryText}`,
         }}
       >
         <Sidebar />

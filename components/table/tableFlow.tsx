@@ -16,21 +16,22 @@ import dagre from "@dagrejs/dagre";
 import { useRouter } from "next/router";
 import { TableSchema } from "../../common/interfaces";
 import { TableNode } from "./tableNode";
+import CustomHoverEdge from "./customEdge";
 
 interface TableFlowProps {
   tableData: TableSchema[];
 }
 
-const nodeWidth = 172;
-const nodeHeight = 36;
+const nodeWidth = 170;
+const nodeHeight = 50;
 
 const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
 const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
   dagreGraph.setGraph({
     rankdir: "TB",
-    ranksep: 150, // vertical space between nodes
-    nodesep: 150, // horizontal space between columns
+    ranksep: 150,
+    nodesep: 150,
   });
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
@@ -88,7 +89,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
         sourceHandle: `${fk.fromColumn}-source`,
         target: fk.toTable,
         targetHandle: `${fk.toColumn}-target`,
-        type: "step",
+        type: "custom",
         data: {
           label: `${table.tableName}.${fk.fromColumn} → ${fk.toTable}.${fk.toColumn}`,
         },
@@ -110,6 +111,12 @@ export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
+  const edgeTypes = useMemo(
+    () => ({
+      custom: CustomHoverEdge,
+    }),
+    []
+  );
 
   const onNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node) => {
@@ -125,11 +132,12 @@ export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       onNodeClick={onNodeClick}
       fitView
       connectionMode={ConnectionMode.Strict}
       nodesDraggable={false}
-      zoomOnScroll={false}
+      zoomOnScroll={true}
       panOnScroll={false}
       panOnDrag={false}
       zoomOnPinch={false}

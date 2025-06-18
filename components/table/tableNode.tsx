@@ -1,50 +1,39 @@
-import { Tooltip } from "@/components/ui/tooltip";
-import { Heading } from "@chakra-ui/react";
+import { primaryText } from "@/common/styles";
+import { Box, Heading } from "@chakra-ui/react";
 import { Handle, NodeProps } from "@xyflow/react";
 
-const primaryText = "#F7FAFC";
-const secondaryText = "#444be5";
-const backgroundColor = "#141414";
-
-const nodeWidth = 172;
-const nodeHeight = 36;
-
 export const TableNode: React.FC<NodeProps> = ({ data }) => {
-  console.log(data);
   return (
-    <span>
-      <div
-        style={{
-          fontSize: 8,
-          padding: "10px 10px 10px 8px",
-          border: "1px solid #ccc",
-          borderRadius: 6,
-          backgroundColor: "#191919", // or use secondaryText if defined
-          color: primaryText,
-          width: 172,
-          height: 70,
-          overflow: "scroll",
-        }}
-      >
-        <Heading size="md">{data.name}</Heading>
-        <div style={{ overflow: "scroll", maxHeight: "8vh" }}>
-          <ul
-            style={{
-              listStyle: "bullet",
-              paddingLeft: 0,
-              color: "#CACBF9",
-            }}
-          >
-            {data.fields.map((field: string, index: number) => (
-              <li key={index}>
-                {field}
-                <Handle type="target" position="top" id={`${field}-target`} />
-                <Handle type="source" position="right" id={`${field}-source`} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </span>
+    <Box
+      fontSize="8px"
+      p="4"
+      border={`1px solid ${primaryText}`}
+      bg="#1a1a1a"
+      color="black"
+      maxH={170}
+      borderRadius="md"
+      transition="transform 0.2s ease, box-shadow 0.2s ease"
+      _hover={{
+        // transform: "scale(1.02)",
+        boxShadow: "0 0 0 4px #444be520",
+        border: "1px solid #444be5",
+        // zIndex: 10,
+      }}
+    >
+      <Heading size="lg" mb={2} color={primaryText} fontWeight="bolder">
+        {data.name}
+      </Heading>
+      <Box maxH="8vh" overflowY="auto" fontSize="sm">
+        <ul style={{ listStyle: "bullet", paddingLeft: 0, color: "#CACBF9" }}>
+          {data.fields.map((field: string, index: number) => (
+            <li key={index}>
+              {field}
+              <Handle type="target" position="top" id={`${field}-target`} />
+              <Handle type="source" position="right" id={`${field}-source`} />
+            </li>
+          ))}
+        </ul>
+      </Box>
+    </Box>
   );
 };
