@@ -1,6 +1,8 @@
 // pages/table/[id].tsx
+import { Input, InputGroup } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { CgSearch } from "react-icons/cg";
 
 export default function TableDetailPage() {
   const router = useRouter();
@@ -26,7 +28,20 @@ export default function TableDetailPage() {
 
   return (
     <div style={{ padding: "2rem" }}>
-      <h1 style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>Table: {id}</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "1rem",
+        }}
+      >
+        <h1 style={{ fontSize: "1.5rem" }}>Table: {id}</h1>
+        <div style={{ width: "50vw", display: "flex" }}>
+          <InputGroup startElement={<CgSearch />}>
+            <Input variant="flushed" color="GrayText"></Input>
+          </InputGroup>
+        </div>
+      </div>
       <table style={{ borderCollapse: "collapse", width: "100%" }}>
         <thead>
           <tr>

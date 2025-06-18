@@ -6,6 +6,9 @@ const primaryText = "#F7FAFC";
 const secondaryText = "#444be5";
 const backgroundColor = "#141414";
 
+const nodeWidth = 172;
+const nodeHeight = 36;
+
 export const TableNode: React.FC<NodeProps> = ({ data }) => {
   console.log(data);
   return (
@@ -18,16 +21,16 @@ export const TableNode: React.FC<NodeProps> = ({ data }) => {
           borderRadius: 6,
           backgroundColor: "#191919", // or use secondaryText if defined
           color: primaryText,
-          width: "10rem",
-          maxHeight: "17vh",
+          width: 172,
+          height: 70,
           overflow: "scroll",
         }}
       >
         <Heading size="md">{data.name}</Heading>
-        <div style={{ overflow: "scroll", maxHeight: "12vh" }}>
+        <div style={{ overflow: "scroll", maxHeight: "8vh" }}>
           <ul
             style={{
-              listStyle: "none",
+              listStyle: "bullet",
               paddingLeft: 0,
               color: "#CACBF9",
             }}
@@ -35,16 +38,8 @@ export const TableNode: React.FC<NodeProps> = ({ data }) => {
             {data.fields.map((field: string, index: number) => (
               <li key={index}>
                 {field}
-                <Handle
-                  type="target"
-                  position="bottom"
-                  id={`${field}-target`}
-                />
-                <Handle
-                  type="source"
-                  position="bottom"
-                  id={`${field}-source`}
-                />
+                <Handle type="target" position="top" id={`${field}-target`} />
+                <Handle type="source" position="right" id={`${field}-source`} />
               </li>
             ))}
           </ul>

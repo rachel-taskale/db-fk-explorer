@@ -1,0 +1,9 @@
+@import url("./xy-theme.css");
+
+:root {
+  --bg-main: #141414;
+  --text-primary: #f7f7f7;
+  --text-secondary: #888888;
+  --card-bg: #1e1e1e;
+  --highlight: #4fc3f7;
+}

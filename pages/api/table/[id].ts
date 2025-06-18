@@ -15,7 +15,8 @@ export async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const result = await client.query(`SELECT * FROM ${id}`);
+    const query = `SELECT * FROM "${id}" LIMIT 100`; // quote the identifier
+    const result = await client.query(query);
     await client.end();
     return res.status(200).json(result.rows);
   } catch (err) {

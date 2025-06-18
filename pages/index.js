@@ -34,7 +34,7 @@ export default function Home() {
   const backgroundColor = "#141414";
   const Sidebar = () => {
     return (
-      <Flex height="80vh">
+      <Flex height="95vh">
         <Box color="white" p={4}>
           <VStack align="start" spacing={10}>
             <Heading size="xl">Database Intropection and Discovery</Heading>
@@ -94,7 +94,7 @@ export default function Home() {
         style={{
           marginTop: 20,
           marginBottom: 20,
-          width: "33.3vh",
+          width: "20vw",
           position: "fixed",
           borderRadius: 20,
           backgroundColor: "#F7FAFC05",
@@ -108,31 +108,15 @@ export default function Home() {
       {/* Main content */}
       <div
         style={{
-          marginLeft: "33.3vh", // 👈 match sidebar width
+          marginLeft: "20vw", // 👈 match sidebar width
           padding: "1rem",
           flexGrow: 1,
           overflow: "auto",
-          height: "100vh",
+          // height: "100vh",
         }}
       >
         {tableData && (
           <>
-            {/* <div
-              style={{
-                border: "1px solid white",
-                borderRadius: 5,
-                padding: "8px 4px 8px 4px ",
-                position: "fixed",
-                backgroundColor: "#141414",
-              }}
-            >
-              <Input
-                name="searchInput"
-                variant="flushed"
-                position="fixed"
-                color={primaryText}
-              />
-            </div> */}
             <TableFlow tableData={tableData} />
           </>
         )}
