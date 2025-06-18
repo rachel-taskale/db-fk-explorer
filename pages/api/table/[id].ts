@@ -36,11 +36,13 @@ export default async function handler(
       default:
         return res.setHeader("Allow", ["GET", "POST"]).status(405).end();
     }
-  } catch (error: any) {
-    console.error("API Error:", error);
-    return res.status(500).json({
-      error: "Internal Server Error",
-      details: error.message,
-    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("API Error:", error);
+      return res.status(500).json({
+        error: "Internal Server Error",
+        details: error.message,
+      });
+    }
   }
 }

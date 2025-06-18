@@ -1,9 +1,9 @@
-import { Client } from "pg";
-import connectDBClient, { testDBClientConnection } from "./client";
+import { Pool } from "pg";
 import { TableSchema } from "./interfaces";
 
-export default async function introspectDB(client: Client) {
+export async function introspectDB(client: Pool) {
   if (!client) {
+    throw Error("Client is null");
     return;
   }
   const columnQuery = `
@@ -39,8 +39,6 @@ export default async function introspectDB(client: Client) {
         AND tc.table_schema = $1
         AND tc.table_name = $2;
       `;
-
-  client.connect();
 
   // Get tables
   const tables = await client.query(tableQuery);
