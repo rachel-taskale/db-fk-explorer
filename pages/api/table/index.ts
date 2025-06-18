@@ -1,11 +1,9 @@
 // pages/api/nodes.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import connectDBClient, {
-  testDBClientConnection,
-} from "../../../common/client";
+import { testDBClientConnection } from "../../../common/client";
 import dotenv from "dotenv";
-import createDBClient from "../../../common/client";
-import introspectDB from "@/common/dbIntrospection";
+import { createDBClient } from "../../../common/client";
+import { introspectDB } from "@/common/dbIntrospection";
 dotenv.config();
 
 export async function post(req: NextApiRequest, res: NextApiResponse) {
@@ -41,6 +39,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  console.log("handler");
   try {
     switch (req.method) {
       case "GET":

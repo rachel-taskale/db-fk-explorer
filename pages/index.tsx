@@ -1,9 +1,8 @@
 // pages/index.js
-import { Box, Heading, Button, Input, Text } from "@chakra-ui/react";
-import { TableFlow } from "../components/tableFlow";
-import Head from "next/head";
+import { Box, Heading, Button, Input, Flex, VStack } from "@chakra-ui/react";
+import { TableFlow } from "../components/table/tableFlow";
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { primaryText, secondaryText } from "../common/styles";
 
 import axios from "axios";
 export default function Home() {
