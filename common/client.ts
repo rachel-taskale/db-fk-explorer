@@ -21,3 +21,37 @@ export async function testDBClientConnection(dbURI: string) {
     await client.end(); // ends the pool and closes all clients
   }
 }
+
+export const validateDbURI = (uri: string): boolean => {
+  const allowedSchemes = [
+    "postgresql://",
+    "postgres://",
+    "mysql://",
+    "mongodb://",
+  ];
+  const hasValidScheme = allowedSchemes.some((scheme) =>
+    uri.toLowerCase().startsWith(scheme)
+  );
+
+  if (!hasValidScheme) {
+    return false;
+  }
+  try {
+    new URL(uri);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const sanitizeDbURI = (uri: string): string => {
+  const blacklistedStrings = [";", "--", "/*", "*/", "xp_", "sp_"];
+
+  for (const str of blacklistedStrings) {
+    if (uri.toLowerCase().includes(str)) {
+      throw new Error("Invalid characters in database URI");
+    }
+  }
+
+  return uri.trim();
+};
