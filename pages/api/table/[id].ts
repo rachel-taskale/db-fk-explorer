@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import createDBClient from "@/common/client";
+import { createDBClient } from "@/common/client";
 
 export async function get(req: NextApiRequest, res: NextApiResponse) {
   const dbURI = process.env.DATABASE_URL!;
@@ -8,18 +8,22 @@ export async function get(req: NextApiRequest, res: NextApiResponse) {
   if (!id) {
     return res.status(400).json({ message: "Missing table name" });
   }
-
-  const client = await createDBClient(dbURI);
+  const client = createDBClient(dbURI);
   if (!client) {
     return res.status(500).json({ message: "Could not create DB client" });
   }
 
+  const isValidIdentifier = /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(id);
+  if (!isValidIdentifier) {
+    return res.status(400).json({ message: "Invalid table name" });
+  }
+
   try {
-    const result = await client.query(`SELECT * FROM ${id}`);
-    await client.end();
+    const query = `SELECT * FROM "${id}" LIMIT 100`;
+    const result = await client.query(query);
     return res.status(200).json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error("Query failed:", err);
     return res.status(500).json({ message: "Query failed" });
   }
 }
