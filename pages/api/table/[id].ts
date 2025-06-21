@@ -1,24 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createDBClient } from "@/common/client";
+import { createApiHandler } from "../createApiHandler";
 
 export async function get(req: NextApiRequest, res: NextApiResponse) {
   const dbURI = process.env.DATABASE_URL;
   if (!dbURI) {
-    return res.status(500).json({ message: "No DB URI found" });
+    throw Error("No DB URI found");
   }
   const id = req.query.id as string;
 
   if (!id) {
-    return res.status(400).json({ message: "Missing table name" });
+    throw Error("Missing table name");
   }
   const client = createDBClient(dbURI);
   if (!client) {
-    return res.status(500).json({ message: "Could not create DB client" });
+    throw Error("Could not create DB client");
   }
 
   const isValidIdentifier = /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(id);
   if (!isValidIdentifier) {
-    return res.status(400).json({ message: "Invalid table name" });
+    throw Error("Invalid table name");
   }
 
   try {
@@ -26,29 +27,17 @@ export async function get(req: NextApiRequest, res: NextApiResponse) {
     const result = await client.query(query);
     return res.status(200).json(result.rows);
   } catch (err) {
-    console.error("Query failed:", err);
-    return res.status(500).json({ message: "Query failed" });
+    throw err;
   }
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  try {
-    switch (req.method) {
-      case "GET":
-        return await get(req, res);
-      default:
-        return res.setHeader("Allow", ["GET", "POST"]).status(405).end();
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("API Error:", error);
-      return res.status(500).json({
-        error: "Internal Server Error",
-        details: error.message,
-      });
-    }
-  }
-}
+const handlers = {
+  POST: async (req: NextApiRequest, res: NextApiResponse) => {
+    res.status(404).json({ status: "Endpoint doesnt exist" });
+  },
+  GET: async (req: NextApiRequest, res: NextApiResponse) => {
+    return await get(req, res);
+  },
+};
+
+export default createApiHandler(handlers);
