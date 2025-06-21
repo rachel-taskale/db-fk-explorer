@@ -2,10 +2,6 @@ import { Pool } from "pg";
 import { TableSchema } from "./interfaces";
 
 export async function introspectDB(client: Pool) {
-  if (!client) {
-    throw Error("Client is null");
-    return;
-  }
   const columnQuery = `
       SELECT column_name, data_type, is_nullable, column_default
       FROM information_schema.columns
