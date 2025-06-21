@@ -16,7 +16,7 @@ import dagre from "@dagrejs/dagre";
 import { useRouter } from "next/router";
 import { TableSchema } from "../../common/interfaces";
 import { TableNode } from "./tableNode";
-import CustomHoverEdge from "./customEdge";
+import { CustomHoverEdge } from "./customEdge";
 
 interface TableFlowProps {
   tableData: TableSchema[];

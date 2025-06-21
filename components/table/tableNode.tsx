@@ -1,7 +1,7 @@
 // TableNode.jsx
 import { Handle } from "@xyflow/react";
 
-export default function TableNode({ data }) {
+export function TableNode({ data }) {
   return (
     <div
       style={{

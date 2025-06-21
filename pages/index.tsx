@@ -2,7 +2,7 @@
 import { Box, Heading, Button, Input, Flex, VStack } from "@chakra-ui/react";
 import { TableFlow } from "../components/table/tableFlow";
 import { useState } from "react";
-import { primaryText, secondaryText } from "../common/styles";
+import { primaryText, secondaryText, backgroundColor } from "../common/styles";
 
 import axios from "axios";
 export default function Home() {
@@ -13,13 +13,12 @@ export default function Home() {
     axios
       .post("/api/table", { uri: dbURI })
       .then((res) => {
+        console.log("here: ", res.data);
         setTableData(res.data);
       })
       .catch((err) => console.error(err));
   };
-  const primaryText = "#F7FAFC";
-  const secondaryText = "#444be5";
-  const backgroundColor = "#141414";
+
   return (
     <div
       style={{
@@ -31,7 +30,7 @@ export default function Home() {
     >
       <Box
         mt="25vh"
-        width="100vh"
+        width="50vh"
         backgroundColor={backgroundColor}
         color={primaryText}
         display="inline-block"
@@ -79,9 +78,15 @@ export default function Home() {
         </div>
       </Box>
       {tableData && (
-        <div style={{ width: "150vh", marginTop: 50 }}>
+        <div
+          style={{
+            width: "150vh",
+            height: "100vh",
+            marginTop: 50,
+          }}
+        >
+          made it here
           <Heading size="2xl">TableFlow</Heading>
-
           <TableFlow tableData={tableData} />
         </div>
       )}
