@@ -36,8 +36,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       new Promise<boolean>((_, reject) =>
         setTimeout(
           () => reject(new Error("Connection timeout")),
-          connectionTimeout
-        )
+          connectionTimeout,
+        ),
       ),
     ]);
 
@@ -53,8 +53,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error("Introspection timeout")),
-          introspectionTimeout
-        )
+          introspectionTimeout,
+        ),
       ),
     ]);
 

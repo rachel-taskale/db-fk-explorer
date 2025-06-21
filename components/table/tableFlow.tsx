@@ -97,13 +97,13 @@ export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
           color: secondaryText,
         },
         style: { stroke: "#555" },
-      }))
+      })),
     );
   }, [tableData]);
 
   const { nodes: layoutedNodes, edges: layoutedEdges } = useMemo(
     () => getLayoutedElements(baseNodes, baseEdges),
-    [baseNodes, baseEdges]
+    [baseNodes, baseEdges],
   );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
@@ -112,14 +112,14 @@ export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
     () => ({
       custom: CustomHoverEdge,
     }),
-    []
+    [],
   );
 
   const onNodeClick = useCallback(
     (_event: React.MouseEvent, node: Node) => {
       router.push(`/table/${node.id}`);
     },
-    [router]
+    [router],
   );
 
   return (
