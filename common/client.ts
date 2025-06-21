@@ -21,21 +21,16 @@ export async function testDBClientConnection(dbURI: string) {
     await client.end(); // ends the pool and closes all clients
   }
 }
-
 export const validateDbURI = (uri: string): boolean => {
-  const allowedSchemes = [
+  const isValidScheme = [
     "postgresql://",
     "postgres://",
     "mysql://",
     "mongodb://",
-  ];
-  const hasValidScheme = allowedSchemes.some((scheme) =>
-    uri.toLowerCase().startsWith(scheme)
-  );
+  ].some((scheme) => uri.toLowerCase().startsWith(scheme));
 
-  if (!hasValidScheme) {
-    return false;
-  }
+  if (!isValidScheme) return false;
+
   try {
     new URL(uri);
     return true;
@@ -44,7 +39,7 @@ export const validateDbURI = (uri: string): boolean => {
   }
 };
 
-export const sanitizeDbURI = (uri: string): string => {
+export const sanitizeString = (uri: string): string => {
   const blacklistedStrings = [";", "--", "/*", "*/", "xp_", "sp_"];
 
   for (const str of blacklistedStrings) {

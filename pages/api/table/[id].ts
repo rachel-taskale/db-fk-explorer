@@ -2,7 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createDBClient } from "@/common/client";
 
 export async function get(req: NextApiRequest, res: NextApiResponse) {
-  const dbURI = process.env.DATABASE_URL!;
+  const dbURI = process.env.DATABASE_URL;
+  if (!dbURI) {
+    return res.status(500).json({ message: "No DB URI found" });
+  }
   const id = req.query.id as string;
 
   if (!id) {

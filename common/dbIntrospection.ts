@@ -67,9 +67,9 @@ export async function introspectDB(client: Pool) {
     if (foreignKeyRelations.rows.length > 0) {
       for (const fk of foreignKeyRelations.rows) {
         foreignKeys.push({
-          fromColumn: fk.column_name,
-          toTable: fk.foreign_table_name,
-          toColumn: fk.foreign_column_name,
+          fromColumn: fk.foreign_column_name,
+          fromTable: fk.foreign_table_name,
+          toColumn: fk.column_name,
         });
       }
     }
