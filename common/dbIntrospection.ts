@@ -59,7 +59,7 @@ export async function introspectDB(client: Pool) {
       table_schema,
       table_name,
     ]);
-    let foreignKeys = [];
+    const foreignKeys = [];
     if (foreignKeyRelations.rows.length > 0) {
       for (const fk of foreignKeyRelations.rows) {
         foreignKeys.push({
