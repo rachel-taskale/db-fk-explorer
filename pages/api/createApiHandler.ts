@@ -10,7 +10,7 @@ type Handlers = Partial<
 export function createApiHandler(handlers: Handlers) {
   return async function wrappedHandler(
     req: NextApiRequest,
-    res: NextApiResponse
+    res: NextApiResponse,
   ) {
     const handler = handlers[req.method as Method];
 
