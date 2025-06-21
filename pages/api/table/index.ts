@@ -7,11 +7,11 @@ import {
   validateDbURI,
 } from "../../../common/client";
 import { introspectDB } from "@/common/dbIntrospection";
+import { classifyTables } from "@/common/classifier";
+import { ForeignKeyReference, TableSchema } from "@/common/interfaces";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
-    console.log(req.body);
-
     if (!req.body || typeof req.body !== "object") {
       throw new Error("Invalid request body");
     }
@@ -46,9 +46,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const client = createDBClient(sanitizedURI);
 
     const introspectionTimeout = 30000;
-    const data = await Promise.race([
+
+    // introspect all the data in the DB
+    const result = await Promise.race([
       introspectDB(client),
-      new Promise((_, reject) =>
+      new Promise<never>((_, reject) =>
         setTimeout(
           () => reject(new Error("Introspection timeout")),
           introspectionTimeout,
@@ -56,7 +58,13 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       ),
     ]);
 
-    console.log(data);
+    const [data, foreignKeyData] = result as [
+      TableSchema[],
+      ForeignKeyReference[],
+    ];
+
+    // create classification model & weighted graph
+    classifyTables(foreignKeyData);
     return data;
   } catch (error) {
     console.error("Database API error:", error);
