@@ -12,25 +12,23 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
     // Input validation
     if (!req.body || typeof req.body !== "object") {
-      return res.status(400).json({ message: "Invalid request body" });
+      throw Error("Invalid request body");
     }
     const { dbURI } = req.body;
 
     if (dbURI && typeof dbURI !== "string") {
-      return res.status(400).json({ message: "dbURI must be a string" });
+      throw Error("dbURI must be a string");
     }
 
-    const resolvedDbURI = dbURI ?? process.env.DATABASE_URL;
-
-    if (!resolvedDbURI) {
-      return res.status(400).json({ message: "No DB URI provided" });
+    if (!dbURI) {
+      throw Error("No DB URI provided");
     }
 
-    if (!validateDbURI(resolvedDbURI)) {
-      return res.status(400).json({ message: "Invalid database URI format" });
+    if (!validateDbURI(dbURI)) {
+      throw Error("Invalid database URI format");
     }
 
-    const sanitizedURI = sanitizeString(resolvedDbURI);
+    const sanitizedURI = sanitizeString(dbURI);
 
     const connectionTimeout = 10000;
     const isValid = await Promise.race([
@@ -44,7 +42,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     ]);
 
     if (!isValid) {
-      return res.status(500).json({ message: "Failed to connect to DB" });
+      throw Error("Failed to connect to DB");
     }
 
     const client = createDBClient(sanitizedURI);
@@ -68,8 +66,7 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       error instanceof Error && error.message.includes("Invalid characters")
         ? error.message
         : "Internal server error";
-
-    res.status(500).json({ message });
+    throw Error(message);
   }
 }
 
@@ -78,7 +75,7 @@ const handlers = {
     await post(req, res);
   },
   GET: async (req: NextApiRequest, res: NextApiResponse) => {
-    res.status(200).json({ status: "healthy" });
+    res.status(404).json({ status: "Endpoint does not exist" });
   },
 };
 
