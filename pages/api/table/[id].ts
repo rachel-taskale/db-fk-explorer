@@ -22,13 +22,9 @@ export async function get(req: NextApiRequest, res: NextApiResponse) {
     throw Error("Invalid table name");
   }
 
-  try {
-    const query = `SELECT * FROM "${id}" LIMIT 100`;
-    const result = await client.query(query);
-    return res.status(200).json(result.rows);
-  } catch (err) {
-    throw err;
-  }
+  const query = `SELECT * FROM "${id}" LIMIT 100`;
+  const result = await client.query(query);
+  return res.status(200).json(result.rows);
 }
 
 const handlers = {

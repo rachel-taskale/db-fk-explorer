@@ -1,5 +1,5 @@
 // pages/index.js
-import { Box, Heading, Button, Input, Flex, VStack } from "@chakra-ui/react";
+import { Box, Heading, Button, Input } from "@chakra-ui/react";
 import { TableFlow } from "../components/table/tableFlow";
 import { useState } from "react";
 import { primaryText, secondaryText, backgroundColor } from "../common/styles";
