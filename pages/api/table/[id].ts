@@ -23,13 +23,12 @@ export async function get(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const query = `SELECT * FROM "${id}" LIMIT 100`;
-  const result = await client.query(query);
-  return res.status(200).json(result.rows);
+  return await client.query(query);
 }
 
 const handlers = {
   POST: async (req: NextApiRequest, res: NextApiResponse) => {
-    res.status(404).json({ status: "Endpoint doesnt exist" });
+    throw Error("Endpoint doesn't exist");
   },
   GET: async (req: NextApiRequest, res: NextApiResponse) => {
     return await get(req, res);

@@ -10,25 +10,23 @@ import { introspectDB } from "@/common/dbIntrospection";
 
 async function post(req: NextApiRequest, res: NextApiResponse) {
   try {
-    // Input validation
+    console.log(req.body);
+
     if (!req.body || typeof req.body !== "object") {
-      throw Error("Invalid request body");
-    }
-    const { dbURI } = req.body;
-
-    if (dbURI && typeof dbURI !== "string") {
-      throw Error("dbURI must be a string");
+      throw new Error("Invalid request body");
     }
 
-    if (!dbURI) {
-      throw Error("No DB URI provided");
+    const { uri } = req.body;
+
+    if (typeof uri !== "string") {
+      throw new Error("`uri` must be a string");
     }
 
-    if (!validateDbURI(dbURI)) {
+    if (!validateDbURI(uri)) {
       throw Error("Invalid database URI format");
     }
 
-    const sanitizedURI = sanitizeString(dbURI);
+    const sanitizedURI = sanitizeString(uri);
 
     const connectionTimeout = 10000;
     const isValid = await Promise.race([
@@ -58,7 +56,8 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       ),
     ]);
 
-    res.status(200).json(data);
+    console.log(data);
+    return data;
   } catch (error) {
     console.error("Database API error:", error);
 
@@ -72,10 +71,10 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
 const handlers = {
   POST: async (req: NextApiRequest, res: NextApiResponse) => {
-    await post(req, res);
+    return await post(req, res);
   },
   GET: async (req: NextApiRequest, res: NextApiResponse) => {
-    res.status(404).json({ status: "Endpoint does not exist" });
+    throw Error("Endpoint does not exist");
   },
 };
 
