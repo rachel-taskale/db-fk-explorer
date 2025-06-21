@@ -60,14 +60,11 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
   };
 };
 
-const pseudoRandom = (str: string) =>
-  str.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-
 export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
   const router = useRouter();
   const secondaryText = "#444be5";
 
-  const nodeTypes = useMemo(() => ({ tableNode: TableNode }), []);
+  const nodeTypes = { tableNode: TableNode };
 
   const baseNodes: Node[] = useMemo(() => {
     return tableData.map((table) => ({
@@ -84,14 +81,14 @@ export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
   const baseEdges: Edge[] = useMemo(() => {
     return tableData.flatMap((table) =>
       table.foreignKeys.map((fk) => ({
-        id: `${table.tableName}-${fk.toTable}-${fk.fromColumn}`,
+        id: `${table.tableName}-${fk.fromTable}-${fk.fromColumn}`,
         source: table.tableName,
         sourceHandle: `${fk.fromColumn}-source`,
-        target: fk.toTable,
+        target: fk.fromTable,
         targetHandle: `${fk.toColumn}-target`,
         type: "custom",
         data: {
-          label: `${table.tableName}.${fk.fromColumn} → ${fk.toTable}.${fk.toColumn}`,
+          label: `${table.tableName}.${fk.fromColumn} → ${fk.fromTable}.${fk.toColumn}`,
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,

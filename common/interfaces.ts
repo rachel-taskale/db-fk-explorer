@@ -1,6 +1,6 @@
 export interface ForeignKeyReference {
   fromColumn: string;
-  toTable: string;
+  fromTable: string;
   toColumn: string;
 }
 
