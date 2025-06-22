@@ -15,7 +15,7 @@ export interface FieldSchema {
 
 export interface TableSchema {
   tableName: string;
-  fields: Map<string, FieldSchema>;
+  fields: Record<string, FieldSchema>;
 }
 
 export enum TableMappingClassification {

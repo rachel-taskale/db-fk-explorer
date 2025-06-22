@@ -64,8 +64,12 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     ];
 
     // create classification model & weighted graph
-    classifyTables(foreignKeyData);
-    return data;
+    const classifiedData = classifyTables(foreignKeyData);
+
+    return {
+      tableData: data,
+      classifiedData: classifiedData,
+    };
   } catch (error) {
     console.error("Database API error:", error);
 

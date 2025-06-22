@@ -10,15 +10,15 @@ export async function introspectDB(client: Pool) {
     const { table_schema, table_name } = row;
     const tableSchema: TableSchema = {
       tableName: table_name,
-      fields: new Map<string, FieldSchema>(),
+      fields: {},
     };
 
     const columns = await client.query(columnQuery, [table_schema, table_name]);
-    const fields = new Map<string, FieldSchema>();
+    const fields: Record<string, FieldSchema> = {};
     for (const col of columns.rows) {
       const columnName = col.column_name as string;
       const field: FieldSchema = { type: col.data_type };
-      fields.set(columnName, field);
+      fields[columnName] = field;
     }
 
     const foreignKeys = await client.query(foreignKeyQuery, [
@@ -26,7 +26,7 @@ export async function introspectDB(client: Pool) {
       table_name,
     ]);
     for (const fk of foreignKeys.rows) {
-      const field = fields.get(fk.column_name);
+      const field = fields[fk.column_name];
       if (field) {
         allForeignKeys.push({
           fromTable: fk.foreign_table_name,

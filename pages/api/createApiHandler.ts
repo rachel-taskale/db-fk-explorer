@@ -23,7 +23,6 @@ export function createApiHandler(handlers: Handlers) {
 
     try {
       const data = await handler(req, res);
-      console.log(data);
       res.status(200).json(data);
     } catch (error) {
       console.error("API Error:", (error as Error).message);
