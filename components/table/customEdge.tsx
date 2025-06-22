@@ -1,6 +1,11 @@
 import { primaryText, secondaryText } from "../../common/styles";
 import { Heading } from "@chakra-ui/react";
-import { EdgeLabelRenderer, EdgeProps, getSmoothStepPath } from "@xyflow/react";
+import {
+  EdgeLabelRenderer,
+  EdgeProps,
+  getBezierPath,
+  getSmoothStepPath,
+} from "@xyflow/react";
 import { useState } from "react";
 
 export const CustomHoverEdge = ({
@@ -15,7 +20,7 @@ export const CustomHoverEdge = ({
 }: EdgeProps) => {
   const [hovered, setHovered] = useState(false);
 
-  const [edgePath] = getSmoothStepPath({
+  const [edgePath] = getBezierPath({
     sourceX,
     sourceY,
     targetX,

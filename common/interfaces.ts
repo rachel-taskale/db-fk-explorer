@@ -24,3 +24,8 @@ export enum TableMappingClassification {
   OneToOne = "ONE_TO_ONE",
   ManyToMany = "MANY_TO_MANY",
 }
+
+export interface fkBucket {
+  classification: TableMappingClassification;
+  references: ForeignKeyReference[];
+}

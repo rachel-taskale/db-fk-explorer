@@ -14,12 +14,18 @@ import {
 
 import dagre from "@dagrejs/dagre";
 import { useRouter } from "next/router";
-import { TableSchema } from "../../common/interfaces";
+import {
+  fkBucket,
+  TableMappingClassification,
+  TableSchema,
+} from "../../common/interfaces";
 import { TableNode } from "./tableNode";
 import { CustomHoverEdge } from "./customEdge";
+import { redirect } from "next/dist/server/api-utils";
 
 interface TableFlowProps {
   tableData: TableSchema[];
+  classifiedData: Record<string, fkBucket>;
 }
 
 const nodeWidth = 170;
@@ -60,13 +66,18 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
   };
 };
 
-export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
+export const TableFlow: React.FC<TableFlowProps> = ({
+  tableData,
+  classifiedData,
+}) => {
   const router = useRouter();
   const secondaryText = "#444be5";
 
   const nodeTypes = { tableNode: TableNode };
 
   const baseNodes: Node[] = useMemo(() => {
+    if (!Array.isArray(tableData)) return [];
+
     return tableData.map((table) => ({
       id: table.tableName,
       type: "tableNode",
@@ -78,17 +89,37 @@ export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
     }));
   }, [tableData]);
 
+  const classifiedStyling = (
+    classification: TableMappingClassification,
+  ): string => {
+    switch (classification) {
+      case TableMappingClassification.ManyToMany:
+        return "red";
+      case TableMappingClassification.OneToMany:
+        return "blue";
+      case TableMappingClassification.ManyToOne:
+        return "green";
+      case TableMappingClassification.OneToOne:
+        return "gray";
+      default:
+        return "#555";
+    }
+  };
   const baseEdges: Edge[] = useMemo(() => {
-    return tableData.flatMap((table) =>
-      table.foreignKeys.map((fk) => ({
-        id: `${table.tableName}-${fk.fromTable}-${fk.fromColumn}`,
-        source: table.tableName,
+    if (!classifiedData || typeof classifiedData !== "object") return [];
+
+    return Object.entries(classifiedData).flatMap(([idx, fkBucket]) => {
+      const classification = fkBucket.classification;
+
+      return fkBucket.references.map((fk) => ({
+        id: `${fk.fromTable}-${fk.fromColumn}-${fk.toTable}-${fk.toColumn}`,
+        source: fk.fromTable,
         sourceHandle: `${fk.fromColumn}-source`,
-        target: fk.fromTable,
+        target: fk.toTable,
         targetHandle: `${fk.toColumn}-target`,
         type: "custom",
         data: {
-          label: `${table.tableName}.${fk.fromColumn} → ${fk.fromTable}.${fk.toColumn}`,
+          label: `${fk.fromTable}.${fk.fromColumn} → ${fk.toTable}.${fk.toColumn}`,
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
@@ -96,10 +127,12 @@ export const TableFlow: React.FC<TableFlowProps> = ({ tableData }) => {
           height: 30,
           color: secondaryText,
         },
-        style: { stroke: "#555" },
-      })),
-    );
-  }, [tableData]);
+        style: {
+          stroke: classifiedStyling(classification),
+        },
+      }));
+    });
+  }, [classifiedData, secondaryText]);
 
   const { nodes: layoutedNodes, edges: layoutedEdges } = useMemo(
     () => getLayoutedElements(baseNodes, baseEdges),

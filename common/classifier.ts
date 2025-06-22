@@ -1,25 +1,16 @@
 import { json } from "stream/consumers";
 import {
+  fkBucket,
   ForeignKeyReference,
   TableMappingClassification,
   TableSchema,
 } from "./interfaces";
 
-interface fkBucket {
-  classification: TableMappingClassification;
-  references: ForeignKeyReference[];
-}
-
 export function classifyTables(fkRefs: ForeignKeyReference[]) {
-  type fkBucket = {
-    classification: TableMappingClassification;
-    references: ForeignKeyReference[];
-  };
-
   const outboundMap: Record<string, fkBucket> = {};
   const inboundCount: Record<string, number> = {};
 
-  // Step 1: Group FKs by source and count inbound FKs
+  // Group FKs by source and count inbound FKs
   for (const fk of fkRefs) {
     const fromKey = `${fk.fromTable}#${fk.fromColumn}`;
     const toKey = `${fk.toTable}#${fk.toColumn}`;
@@ -38,7 +29,7 @@ export function classifyTables(fkRefs: ForeignKeyReference[]) {
     outboundMap[fromKey]!.references.push(fk);
   }
 
-  for (const [fromKey, bucket] of Object.entries(outboundMap)) {
+  for (const [_, bucket] of Object.entries(outboundMap)) {
     const references = bucket.references;
 
     const allUniqueTargets = new Set(bucket.references.map((fk) => fk.toTable));
@@ -62,11 +53,5 @@ export function classifyTables(fkRefs: ForeignKeyReference[]) {
     }
   }
 
-  // Final Output
-  // console.log("====== CLASSIFIED FKs ======");
-  // for (const [key, bucket] of outboundMap.entries()) {
-  //   console.log(key, bucket.classification, bucket.references);
-  // }
-  console.log(outboundMap);
   return outboundMap;
 }

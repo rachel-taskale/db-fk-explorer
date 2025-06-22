@@ -6,7 +6,7 @@ import { primaryText, secondaryText, backgroundColor } from "../common/styles";
 
 import axios from "axios";
 export default function Home() {
-  const [tableData, setTableData] = useState();
+  const [allNodeData, setAllNodeData] = useState();
   const [dbURI, setDbURI] = useState("");
   const onSubmit = () => {
     console.log(dbURI);
@@ -14,7 +14,7 @@ export default function Home() {
       .post("/api/table", { uri: dbURI })
       .then((res) => {
         console.log("here: ", res.data);
-        setTableData(res.data);
+        setAllNodeData(res.data);
       })
       .catch((err) => console.error(err));
   };
@@ -77,7 +77,7 @@ export default function Home() {
           </Button>
         </div>
       </Box>
-      {tableData && (
+      {allNodeData && (
         <div
           style={{
             width: "150vh",
@@ -87,7 +87,10 @@ export default function Home() {
         >
           made it here
           <Heading size="2xl">TableFlow</Heading>
-          <TableFlow tableData={tableData} />
+          <TableFlow
+            tableData={allNodeData["tableData"]}
+            classifiedData={allNodeData["classifiedData"]}
+          />
         </div>
       )}
     </div>
