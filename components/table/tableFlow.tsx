@@ -42,7 +42,7 @@ const nodeHeight = 200;
 const getLayoutedElements = async (
   nodes: Node[],
   edges: Edge[],
-  direction: "RIGHT" | "DOWN" = "RIGHT",
+  direction: "RIGHT" | "DOWN",
 ): Promise<{ nodes: Node[]; edges: Edge[] }> => {
   const elkNodes = nodes.map((node) => ({
     id: node.id,
@@ -57,11 +57,7 @@ const getLayoutedElements = async (
 
   const layoutGraph = {
     id: "root",
-    layoutOptions: {
-      "elk.algorithm": "layered",
-      "elk.direction": "DOWN",
-      "elk.spacing.nodeNode": "200",
-    },
+    layoutOptions: elkOptions,
     children: elkNodes,
     edges: elkEdges,
   };
@@ -144,7 +140,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({
         sourceHandle: `${fk.fromColumn}-source`,
         target: fk.toTable,
         targetHandle: `${fk.toColumn}-target`,
-        type: "custom",
+        type: "tableNode",
         data: {
           label: `${fk.fromTable}.${fk.fromColumn} → ${fk.toTable}.${fk.toColumn}`,
         },

@@ -8,6 +8,17 @@ import {
 } from "@xyflow/react";
 import { useState } from "react";
 
+type CustomHoverEdgeProps = {
+  id: string;
+  sourceX: number;
+  sourceY: number;
+  targetX: number;
+  targetY: number;
+  style?: React.CSSProperties;
+  markerEnd?: string;
+  data?: Record<string, string>;
+};
+
 export const CustomHoverEdge = ({
   id,
   sourceX,
@@ -17,7 +28,7 @@ export const CustomHoverEdge = ({
   style,
   markerEnd,
   data,
-}: EdgeProps) => {
+}: CustomHoverEdgeProps) => {
   const [hovered, setHovered] = useState(false);
 
   const [edgePath] = getSmoothStepPath({
