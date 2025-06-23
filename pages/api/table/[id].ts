@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createDBClient } from "@/common/client";
 import { createApiHandler } from "../createApiHandler";
 
-export async function get(req: NextApiRequest, res: NextApiResponse) {
+export async function get(req: NextApiRequest, _: NextApiResponse) {
   const dbURI = process.env.DATABASE_URL;
   if (!dbURI) {
     throw Error("No DB URI found");
@@ -27,7 +27,7 @@ export async function get(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handlers = {
-  POST: async (req: NextApiRequest, res: NextApiResponse) => {
+  POST: async (_: NextApiRequest, res: NextApiResponse) => {
     throw Error("Endpoint doesn't exist");
   },
   GET: async (req: NextApiRequest, res: NextApiResponse) => {

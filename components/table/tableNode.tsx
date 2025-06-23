@@ -1,7 +1,10 @@
 // TableNode.jsx
-import { Handle } from "@xyflow/react";
-
-export function TableNode({ data }) {
+import { Handle, NodeProps, Position } from "@xyflow/react";
+interface TableNodeData {
+  name: string;
+  fields: string[];
+}
+export function TableNode({ data }: NodeProps<TableNodeData>) {
   return (
     <div
       style={{
@@ -10,6 +13,8 @@ export function TableNode({ data }) {
         borderRadius: 6,
         background: "white",
         color: "black",
+        height: 200,
+        width: 200,
       }}
     >
       <strong>{data.name}</strong>
@@ -17,7 +22,6 @@ export function TableNode({ data }) {
         {data.fields.map((field, index) => (
           <li key={index}>
             {field}
-            {/* Input handle for foreign keys */}
             <Handle
               type="target"
               position="left"

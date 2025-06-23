@@ -1,4 +1,5 @@
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useEffect } from "react";
+import ELK from "elkjs/lib/elk.bundled.js";
 import "@xyflow/react/dist/style.css";
 
 import {
@@ -12,7 +13,6 @@ import {
   MarkerType,
 } from "@xyflow/react";
 
-import dagre from "@dagrejs/dagre";
 import { useRouter } from "next/router";
 import {
   fkBucket,
@@ -28,43 +28,63 @@ interface TableFlowProps {
   classifiedData: Record<string, fkBucket>;
 }
 
-const nodeWidth = 170;
-const nodeHeight = 50;
+const elk = new ELK();
 
-const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-
-const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
-  dagreGraph.setGraph({
-    rankdir: "TB",
-    ranksep: 150,
-    nodesep: 150,
-  });
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
-  });
-
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target);
-  });
-
-  dagre.layout(dagreGraph);
-
-  return {
-    nodes: nodes.map((node) => {
-      const layout = dagreGraph.node(node.id);
-      return {
-        ...node,
-        targetPosition: "top",
-        sourcePosition: "bottom",
-        position: {
-          x: layout.x - nodeWidth / 2,
-          y: layout.y - nodeHeight / 2,
-        },
-      };
-    }),
-    edges,
-  };
+const elkOptions = {
+  "elk.algorithm": "layered",
+  "elk.layered.spacing.nodeNodeBetweenLayers": "100",
+  "elk.spacing.nodeNode": "80",
 };
+
+const nodeWidth = 200;
+const nodeHeight = 200;
+
+const getLayoutedElements = async (
+  nodes: Node[],
+  edges: Edge[],
+  direction: "RIGHT" | "DOWN" = "RIGHT",
+): Promise<{ nodes: Node[]; edges: Edge[] }> => {
+  const elkNodes = nodes.map((node) => ({
+    id: node.id,
+    width: nodeWidth,
+    height: nodeHeight,
+  }));
+  const elkEdges = edges.map((edge) => ({
+    id: edge.id,
+    sources: [edge.source],
+    targets: [edge.target],
+  }));
+
+  const layoutGraph = {
+    id: "root",
+    layoutOptions: {
+      "elk.algorithm": "layered",
+      "elk.direction": "DOWN",
+      "elk.spacing.nodeNode": "200",
+    },
+    children: elkNodes,
+    edges: elkEdges,
+  };
+
+  const layout = await elk.layout(layoutGraph);
+
+  const positionedNodes = nodes.map((node) => {
+    const layoutNode = layout.children?.find((n) => n.id === node.id);
+    return {
+      ...node,
+      position: {
+        x: layoutNode?.x ?? 0,
+        y: layoutNode?.y ?? 0,
+      },
+      targetPosition: "top",
+      sourcePosition: "bottom",
+    };
+  });
+
+  return { nodes: positionedNodes, edges: edges };
+};
+
+const CalculateClosestNodePosition = () => {};
 
 export const TableFlow: React.FC<TableFlowProps> = ({
   tableData,
@@ -77,6 +97,13 @@ export const TableFlow: React.FC<TableFlowProps> = ({
 
   const baseNodes: Node[] = useMemo(() => {
     if (!Array.isArray(tableData)) return [];
+    const fkFields = new Set<string>();
+    Object.values(classifiedData).forEach((bucket) => {
+      bucket.references.forEach((fk) => {
+        fkFields.add(`${fk.fromTable}.${fk.fromColumn}`);
+        fkFields.add(`${fk.toTable}.${fk.toColumn}`);
+      });
+    });
 
     return tableData.map((table) => ({
       id: table.tableName,
@@ -133,14 +160,20 @@ export const TableFlow: React.FC<TableFlowProps> = ({
       }));
     });
   }, [classifiedData, secondaryText]);
+  const [nodes, setNodes, onNodesChange] = useNodesState(baseNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(baseEdges);
+  useEffect(() => {
+    const layoutFlow = async () => {
+      const { nodes: layoutedNodes, edges: layoutedEdges } =
+        await getLayoutedElements(baseNodes, baseEdges, "RIGHT");
 
-  const { nodes: layoutedNodes, edges: layoutedEdges } = useMemo(
-    () => getLayoutedElements(baseNodes, baseEdges),
-    [baseNodes, baseEdges],
-  );
+      setNodes(layoutedNodes);
+      setEdges(layoutedEdges);
+    };
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
+    layoutFlow();
+  }, [baseNodes, baseEdges]);
+
   const edgeTypes = useMemo(
     () => ({
       custom: CustomHoverEdge,
@@ -173,6 +206,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({
       zoomOnPinch={false}
       zoomOnDoubleClick={false}
       preventScrolling={false}
+      style={{ border: "1px solid red" }}
     >
       <Background />
     </ReactFlow>

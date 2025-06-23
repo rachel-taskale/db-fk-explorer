@@ -20,7 +20,7 @@ export const CustomHoverEdge = ({
 }: EdgeProps) => {
   const [hovered, setHovered] = useState(false);
 
-  const [edgePath] = getBezierPath({
+  const [edgePath] = getSmoothStepPath({
     sourceX,
     sourceY,
     targetX,
