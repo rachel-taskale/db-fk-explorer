@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { BiLeftArrow } from "react-icons/bi";
 import { CgSearch } from "react-icons/cg";
 import { GoArrowLeft } from "react-icons/go";
-import { HiArrowLeftStartOnRectangle } from "react-icons/hi2";
 
 export default function TableDetailPage() {
   const router = useRouter();
@@ -18,7 +17,6 @@ export default function TableDetailPage() {
     const fetchData = async () => {
       const res = await fetch(`/api/table/${id}`);
       const data = await res.json();
-      console.log(data);
       setTableData(data.fields);
       setLoading(false);
     };

@@ -1,17 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createDBClient } from "@/common/client";
 import { createApiHandler } from "../createApiHandler";
+import { withSession } from "@/lib/session";
 
-export async function get(req: NextApiRequest, _: NextApiResponse) {
-  const dbURI = process.env.DATABASE_URL;
+export async function get(req: NextApiRequest, res: NextApiResponse) {
+  const dbURI = req.session.dbURI;
   if (!dbURI) {
     throw Error("No DB URI found");
   }
-  const id = req.query.id as string;
-
+  const { id } = req.query;
   if (!id) {
     throw Error("Missing table name");
   }
+
   const client = createDBClient(dbURI);
   if (!client) {
     throw Error("Could not create DB client");
@@ -21,9 +22,17 @@ export async function get(req: NextApiRequest, _: NextApiResponse) {
   if (!isValidIdentifier) {
     throw Error("Invalid table name");
   }
+  console.log("name: " + id);
 
-  const query = `SELECT * FROM "${id}" LIMIT 100`;
-  return await client.query(query);
+  try {
+    const query = `SELECT * FROM "${id}" LIMIT 100`;
+    const result = await client.query(query);
+    console.log(result);
+    return result;
+  } catch (err) {
+    console.error("DB query failed:", err);
+    return { error: "Query failed" };
+  }
 }
 
 const handlers = {
@@ -35,4 +44,4 @@ const handlers = {
   },
 };
 
-export default createApiHandler(handlers);
+export default withSession(createApiHandler(handlers));

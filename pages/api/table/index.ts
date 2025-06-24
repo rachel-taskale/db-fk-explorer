@@ -9,18 +9,11 @@ import {
 import { introspectDB } from "@/common/dbIntrospection";
 import { classifyTables } from "@/common/classifier";
 import { ForeignKeyReference, TableSchema } from "@/common/interfaces";
+import { withSession } from "@/lib/session";
 
-async function post(req: NextApiRequest, res: NextApiResponse) {
+async function get(req: NextApiRequest, res: NextApiResponse) {
   try {
-    if (!req.body || typeof req.body !== "object") {
-      throw new Error("Invalid request body");
-    }
-
-    const { uri } = req.body;
-
-    if (typeof uri !== "string") {
-      throw new Error("`uri` must be a string");
-    }
+    const uri = req.session.dbURI;
 
     if (!validateDbURI(uri)) {
       throw Error("Invalid database URI format");
@@ -83,11 +76,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
 const handlers = {
   POST: async (req: NextApiRequest, res: NextApiResponse) => {
-    return await post(req, res);
+    throw Error("Endpoint does not exist");
   },
   GET: async (req: NextApiRequest, res: NextApiResponse) => {
-    throw Error("Endpoint does not exist");
+    return await get(req, res);
   },
 };
 
-export default createApiHandler(handlers);
+export default withSession(createApiHandler(handlers));

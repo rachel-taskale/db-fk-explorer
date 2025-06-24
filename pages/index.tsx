@@ -8,28 +8,49 @@ import {
   Text,
   Link,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { TableSchema } from "@/common/interfaces";
 import { TableFlow } from "../components/table/tableFlow";
 import { backgroundColor } from "@/common/styles";
 import { ReactFlowProvider } from "@xyflow/react";
+import api from "@/lib/axios";
 
 export default function Home() {
-  const [dbURI, setDbURI] = useState("");
   const [tableData, setTableData] = useState<TableSchema[]>([]);
   const [classifiedData, setAllClassifiedData] = useState({});
+  const [dbURI, setDbURI] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const onSubmit = () => {
-    axios
-      .post("/api/table", { uri: dbURI })
-      .then((res) => {
-        setTableData(res.data["tableData"]);
-        setAllClassifiedData(res.data["classifiedData"]);
-      })
-      .catch((err) => console.error(err));
+  const retreiveNodeData = async () => {
+    try {
+      const result = await api.get("/table");
+      setTableData(result.data["tableData"]);
+      setAllClassifiedData(result.data["classifiedData"]);
+    } catch (err) {
+      console.error("Failed to set dbURI:", err);
+      setError("Failed to connect. Please check your URI.");
+    }
   };
 
+  const onSubmit = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      await api.post("/session/set-dburi", { dbURI });
+      retreiveNodeData();
+    } catch (err: any) {
+      console.error("Failed to set dbURI:", err);
+      setError("Failed to connect. Please check your URI.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    retreiveNodeData();
+  }, []);
   return (
     <Flex
       height="100vh"
