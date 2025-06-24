@@ -1,98 +1,126 @@
-// pages/index.js
-import { Box, Heading, Button, Input } from "@chakra-ui/react";
-import { TableFlow } from "../components/table/tableFlow";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Input,
+  VStack,
+  Text,
+  Link,
+} from "@chakra-ui/react";
 import { useState } from "react";
-import { primaryText, secondaryText, backgroundColor } from "../common/styles";
-
 import axios from "axios";
+import { TableSchema } from "@/common/interfaces";
+import { TableFlow } from "../components/table/tableFlow";
+import { backgroundColor } from "@/common/styles";
+import { ReactFlowProvider } from "@xyflow/react";
+
 export default function Home() {
-  const [allNodeData, setAllNodeData] = useState();
   const [dbURI, setDbURI] = useState("");
+  const [tableData, setTableData] = useState<TableSchema[]>([]);
+  const [classifiedData, setAllClassifiedData] = useState({});
+
   const onSubmit = () => {
-    console.log(dbURI);
     axios
       .post("/api/table", { uri: dbURI })
       .then((res) => {
-        console.log("here: ", res.data);
-        setAllNodeData(res.data);
+        setTableData(res.data["tableData"]);
+        setAllClassifiedData(res.data["classifiedData"]);
       })
       .catch((err) => console.error(err));
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: "#141414",
-        height: "100rem",
-        justifyItems: "center",
-        // alignContent: "center",
-      }}
+    <Flex
+      height="100vh"
+      bg="#0f1117"
+      color="#f5f6fa"
+      fontFamily="system-ui, sans-serif"
     >
+      {/* Sidebar */}
       <Box
-        mt="25vh"
-        width="50vh"
-        backgroundColor={backgroundColor}
-        color={primaryText}
-        display="inline-block"
-        spaceY={10}
+        width="300px"
+        bg="#1c1f26"
+        borderRight="1px solid #2a2d34"
+        p={6}
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
       >
-        <div>
-          <Heading size="2xl">Database Intropection and Discovery</Heading>
-          <Heading size="lg" fontWeight="light" color="#CACBF9">
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-            accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-            quae ab illo inventore veritatis et quasi architecto beatae vitae
-            dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-            aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-            eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est,
-            qui dolorem ipsum quia dolor{" "}
+        <VStack align="start" spacing={6}>
+          <Heading size="md" color="#f5f6fa">
+            Schema Explorer
           </Heading>
-        </div>
-        <Input
-          size="lg"
-          variant="flushed"
-          color={primaryText}
-          name="dbURI"
-          onChange={(e) => {
-            setDbURI(e.target.value);
-            console.log(e.target.value);
-          }}
-          placeholder="Enter DB URI e.g. postgresql://user:password@localhost:51214/chinook"
-        />
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginTop: "1rem",
-          }}
-        >
+          <Box width="100%">
+            <Text mb={1} fontSize="sm" color="gray.400">
+              Database URI
+            </Text>
+            <Input
+              placeholder="e.g. postgresql://..."
+              value={dbURI}
+              onChange={(e) => setDbURI(e.target.value)}
+              size="sm"
+              variant="filled"
+              bg="#2a2d34"
+              color="#f5f6fa"
+              _hover={{ bg: "#32363f" }}
+              _focus={{
+                borderColor: "#635bff",
+                boxShadow: "0 0 0 1px #635bff",
+              }}
+            />
+          </Box>
+
           <Button
-            size="lg"
-            backgroundColor={secondaryText}
-            color={primaryText}
+            width="100%"
+            size="sm"
+            bg="#635bff"
+            color="white"
+            fontWeight="medium"
+            _hover={{ bg: "#7a6fff" }}
             onClick={onSubmit}
           >
-            Generate
+            Generate Schema
           </Button>
-        </div>
+          {tableData && (
+            <div>
+              {tableData.map((item) => (
+                <ul style={{ opacity: ".6", padding: "10px 0px 10px  0px" }}>
+                  <Link key={item.tableName} href={`/table/${item.tableName}`}>
+                    <div style={{ cursor: "pointer" }}>{item.tableName}</div>
+                  </Link>
+                </ul>
+              ))}
+              <Text></Text>
+            </div>
+          )}
+        </VStack>
+
+        <Text fontSize="xs" color="gray.600" mt={10}>
+          © 2025 SchemaApp Inc.
+        </Text>
       </Box>
-      {allNodeData && (
-        <div
-          style={{
-            width: "150vh",
-            height: "100vh",
-            marginTop: 50,
-          }}
-        >
-          made it here
-          <Heading size="2xl">TableFlow</Heading>
-          <TableFlow
-            tableData={allNodeData["tableData"]}
-            classifiedData={allNodeData["classifiedData"]}
-          />
-        </div>
-      )}
-    </div>
+
+      {/* Main Area */}
+      <Box flex="1" bg="#0f1117">
+        {tableData ? (
+          <ReactFlowProvider>
+            <TableFlow tableData={tableData} classifiedData={classifiedData} />
+          </ReactFlowProvider>
+        ) : (
+          <Flex align="center" justify="center" height="100%">
+            <VStack spacing={2}>
+              <Heading size="md" color="gray.500">
+                Connect to your database
+              </Heading>
+              <Text fontSize="sm" color="gray.600">
+                Visualize schema relationships
+              </Text>
+            </VStack>
+          </Flex>
+        )}
+      </Box>
+    </Flex>
   );
 }

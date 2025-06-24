@@ -1,8 +1,8 @@
 import { useMemo, useCallback, useEffect } from "react";
 import ELK from "elkjs/lib/elk.bundled.js";
-import "@xyflow/react/dist/style.css";
-
 import {
+  ReactFlowProvider,
+  useReactFlow,
   ReactFlow,
   Background,
   Node,
@@ -13,6 +13,8 @@ import {
   MarkerType,
 } from "@xyflow/react";
 
+import "@xyflow/react/dist/style.css";
+
 import { useRouter } from "next/router";
 import {
   fkBucket,
@@ -22,6 +24,7 @@ import {
 import { TableNode } from "./tableNode";
 import { CustomHoverEdge } from "./customEdge";
 import { redirect } from "next/dist/server/api-utils";
+import { Box, Button } from "@chakra-ui/react";
 
 interface TableFlowProps {
   tableData: TableSchema[];
@@ -183,28 +186,51 @@ export const TableFlow: React.FC<TableFlowProps> = ({
     },
     [router],
   );
+  const { zoomIn, zoomOut, fitView } = useReactFlow();
 
   return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      nodeTypes={nodeTypes}
-      edgeTypes={edgeTypes}
-      onNodeClick={onNodeClick}
-      fitView
-      connectionMode={ConnectionMode.Strict}
-      nodesDraggable={false}
-      zoomOnScroll={true}
-      panOnScroll={false}
-      panOnDrag={false}
-      zoomOnPinch={false}
-      zoomOnDoubleClick={false}
-      preventScrolling={false}
-      style={{ border: "1px solid red" }}
-    >
-      <Background />
-    </ReactFlow>
+    <Box position="relative" width="100%" height="100%">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        onNodeClick={onNodeClick}
+        fitView
+        connectionMode={ConnectionMode.Strict}
+        nodesDraggable={false}
+        zoomOnScroll={true}
+        panOnScroll={false}
+        panOnDrag={false}
+        zoomOnPinch={false}
+        zoomOnDoubleClick={false}
+        preventScrolling={false}
+        style={{ border: "none" }}
+      >
+        <Background />
+      </ReactFlow>
+
+      {/* Zoom controls */}
+      <Box
+        position="absolute"
+        top="20px"
+        right="20px"
+        zIndex="100"
+        display="flex"
+        gap={2}
+      >
+        <Button size="md" onClick={() => zoomOut()} variant="outline">
+          −
+        </Button>
+        <Button size="md" onClick={() => zoomIn()} variant="outline">
+          +
+        </Button>
+        <Button size="md" onClick={() => fitView()} variant="outline">
+          Reset
+        </Button>
+      </Box>
+    </Box>
   );
 };
