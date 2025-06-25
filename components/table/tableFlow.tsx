@@ -37,28 +37,31 @@ interface TableFlowProps {
 
 const elk = new ELK();
 
-const elkOptions = {
-  "elk.algorithm": "layered",
-  "elk.layered.spacing.nodeNodeBetweenLayers": "100",
-  "elk.spacing.nodeNode": "80",
-};
-
-const nodeWidth = 350;
+const nodeWidth = 300;
 const nodeHeight = 350;
 
 const getLayoutedElements = async (
   nodes: Node[],
   edges: Edge[],
-  direction: "RIGHT" | "DOWN",
+  direction: "RIGHT" | "DOWN" | "UP" | "LEFT",
   classifiedData: Record<string, fkBucket>,
 ): Promise<{ nodes: Node[]; edges: Edge[] }> => {
-  console.log(nodes);
+  const elkOptions = {
+    "elk.algorithm": "layered",
+    "elk.direction": direction,
+    "elk.layered.spacing.nodeNodeBetweenLayers": "100",
+    "elk.spacing.nodeNode": "100",
+    "elk.spacing.edgeNode": "50",
+    "elk.spacing.edgeEdge": "100",
+    "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
+    "elk.layered.edgeRouting": "ORTHOGONAL",
+  };
   const elkNodes = nodes.map((node) => ({
     id: node.id,
     width: nodeWidth,
     height: nodeHeight,
   }));
-  console.log(edges);
+
   const elkEdges = edges.map((edge) => ({
     id: edge.id,
     sources: [edge.source],
@@ -67,13 +70,31 @@ const getLayoutedElements = async (
 
   const layoutGraph = {
     id: "root",
-    layoutOptions: elkOptions,
+    layoutOptions: {
+      ...elkOptions,
+      "elk.direction": direction,
+    },
     children: elkNodes,
     edges: elkEdges,
   };
 
+  function getPortPositions(direction: string) {
+    switch (direction) {
+      case "RIGHT":
+        return { sourcePosition: "right", targetPosition: "left" };
+      case "LEFT":
+        return { sourcePosition: "left", targetPosition: "right" };
+      case "UP":
+        return { sourcePosition: "top", targetPosition: "bottom" };
+      case "DOWN":
+      default:
+        return { sourcePosition: "bottom", targetPosition: "top" };
+    }
+  }
   const layout = await elk.layout(layoutGraph);
-
+  const { sourcePosition, targetPosition } = getPortPositions(direction);
+  console.log(sourcePosition);
+  console.log(targetPosition);
   const positionedNodes = nodes.map((node) => {
     const layoutNode = layout.children?.find((n) => n.id === node.id);
     // Get all the fields in our classfied list that have connections
@@ -87,27 +108,10 @@ const getLayoutedElements = async (
         x: layoutNode?.x ?? 0,
         y: layoutNode?.y ?? 0,
       },
-      targetPosition: "top",
-      sourcePosition: "bottom",
+      targetPosition,
+      sourcePosition,
     };
   });
-
-  // const positionedNodesWithReferences = positionedNodes.map((node) => {
-  //   const nodeId = node["id"];
-
-  //   const connectedFields = Object.entries(classifiedData).filter(([key]) =>
-  //     key.includes(nodeId),
-  //   );
-
-  //   const references = positionedNodes.filter((item) =>
-  //     Object.entries(connectedFields).some(([key, fieldData]) => {
-  //       return fieldData[0].includes(item["id"]);
-  //     }),
-  //   );
-  //   node["data"]["references"] = references;
-  //   return { ...node };
-  // });
-  // console.log(positionedNodesWithReferences);
 
   return { nodes: positionedNodes, edges: edges };
 };
@@ -118,6 +122,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({
 }) => {
   const router = useRouter();
   const nodeTypes = { tableNode: TableNode };
+  const direction = "RIGHT";
 
   const getMarkerTypes = (
     classification: TableMappingClassification,
@@ -151,7 +156,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({
         };
     }
   };
-  console.log(tableData);
+
   const baseNodes: Node[] = useMemo(() => {
     if (!Array.isArray(tableData)) return [];
 
@@ -165,7 +170,6 @@ export const TableFlow: React.FC<TableFlowProps> = ({
       },
     }));
   }, [tableData]);
-  console.log(baseNodes);
 
   const baseEdges: Edge[] = useMemo(() => {
     if (!classifiedData || typeof classifiedData !== "object") return [];
@@ -205,7 +209,12 @@ export const TableFlow: React.FC<TableFlowProps> = ({
   useEffect(() => {
     const layoutFlow = async () => {
       const { nodes: layoutedNodes, edges: layoutedEdges } =
-        await getLayoutedElements(baseNodes, baseEdges, "DOWN", classifiedData);
+        await getLayoutedElements(
+          baseNodes,
+          baseEdges,
+          direction,
+          classifiedData,
+        );
 
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);

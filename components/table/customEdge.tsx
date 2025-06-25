@@ -1,13 +1,11 @@
 import { primaryText } from "../../common/styles";
-import { Heading } from "@chakra-ui/react";
 import {
   EdgeLabelRenderer,
-  EdgeProps,
   getBezierPath,
+  getEdgeCenter,
   getSmoothStepPath,
   getStraightPath,
 } from "@xyflow/react";
-import { useState } from "react";
 
 type CustomHoverEdgeProps = {
   id: string;
@@ -30,7 +28,15 @@ export const CustomHoverEdge = ({
   markerEnd,
   data,
 }: CustomHoverEdgeProps) => {
-  const [edgePath] = getStraightPath({
+  const [edgePath] = getBezierPath({
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+  });
+
+  // ✅ Calculate center of the edge
+  const [labelX, labelY] = getEdgeCenter({
     sourceX,
     sourceY,
     targetX,
@@ -39,54 +45,42 @@ export const CustomHoverEdge = ({
 
   return (
     <>
+      {/* Invisible fat path for easier hover/click */}
       <path
         d={edgePath}
         stroke="transparent"
         strokeWidth={40}
         fill="none"
-        style={{ pointerEvents: "stroke" }}
+        style={{ pointerEvents: "stroke", zIndex: 1000 }}
       />
 
+      {/* Actual visible edge */}
       <path
         id={id}
         d={edgePath}
         fill="none"
-        style={style}
+        style={{ ...style, strokeLinecap: "round" }}
         markerEnd={markerEnd}
       />
 
+      {/* Midpoint label */}
       <EdgeLabelRenderer>
         <div
           style={{
             position: "absolute",
-            transform: `translate(-50%, -50%) translate(${sourceX}px, ${sourceY}px)`,
+            zIndex: 1000, // ⬅️ bring label on top of nodes
+            transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
             fontSize: 10,
             background: "#1a1a1a",
             color: primaryText,
             padding: "1px 6px",
             borderRadius: 4,
+            border: "1px solid white",
             whiteSpace: "nowrap",
             pointerEvents: "none",
           }}
         >
-          {data?.fromField}
-        </div>
-      </EdgeLabelRenderer>
-      <EdgeLabelRenderer>
-        <div
-          style={{
-            position: "absolute",
-            transform: `translate(-50%, -50%) translate(${targetX}px, ${targetY}px)`,
-            fontSize: 10,
-            background: "#1a1a1a",
-            color: primaryText,
-            padding: "1px 6px",
-            borderRadius: 4,
-            whiteSpace: "nowrap",
-            pointerEvents: "none",
-          }}
-        >
-          {data?.toField}
+          {data["label"]}
         </div>
       </EdgeLabelRenderer>
     </>

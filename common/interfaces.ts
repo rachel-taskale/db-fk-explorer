@@ -29,3 +29,15 @@ export interface fkBucket {
   classification: TableMappingClassification;
   references: string[];
 }
+
+export enum position {
+  top = "TOP",
+  bottom = "BOTTOM",
+  right = "RIGHT",
+  left = "LEFT",
+}
+
+export interface nodePositions {
+  sourceNode: position;
+  targetNode: position;
+}

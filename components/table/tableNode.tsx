@@ -1,22 +1,8 @@
+import { nodePositions, position } from "@/common/interfaces";
 import { primaryText, secondaryText } from "@/common/styles";
 import { Handle, NodeProps } from "@xyflow/react";
 
 export function TableNode({ data }: NodeProps<TableNodeData>) {
-  const determineClosestNodeSide = (field, connections) => {
-    // We need the point that we have a connection with
-    // If one node is more on the left than on the right then we need to determine the side
-    //
-    // console.log(field);
-    // console.log(connections);
-  };
-
-  const positions = data.fields.map((item) => {
-    // console.log(data.classifiedConnections);
-    if (data.classifiedConnections) {
-      determineClosestNodeSide(item, data.classifiedConnections);
-    }
-  });
-
   return (
     <div
       style={{
@@ -25,7 +11,8 @@ export function TableNode({ data }: NodeProps<TableNodeData>) {
         borderRadius: "8px",
         background: "#1d1f26",
         color: primaryText,
-        width: 240,
+        width: 300,
+        height: 350,
         boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
         fontFamily: "system-ui, sans-serif",
       }}
@@ -44,7 +31,7 @@ export function TableNode({ data }: NodeProps<TableNodeData>) {
           listStyle: "none",
           paddingLeft: 0,
           margin: 0,
-          maxHeight: 300,
+          maxHeight: 250,
           overflow: "scroll",
         }}
       >
@@ -53,7 +40,7 @@ export function TableNode({ data }: NodeProps<TableNodeData>) {
             key={index}
             style={{
               fontSize: "1rem",
-              padding: "4px 0",
+              padding: "4px 0 4px 0",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
@@ -65,16 +52,14 @@ export function TableNode({ data }: NodeProps<TableNodeData>) {
 
             <Handle
               type="target"
-              position="left"
+              position={data["targetPosition"]}
               id={`${field}-target`}
-              style={{ top: "50%", transform: "translateY(-50%)" }}
             />
 
             <Handle
               type="source"
-              position="right"
+              position={data["sourcePosition"]}
               id={`${field}-source`}
-              style={{ top: "50%", transform: "translateY(-50%)" }}
             />
           </div>
         ))}
