@@ -8,7 +8,11 @@ import {
 } from "../../../common/client";
 import { introspectDB } from "@/common/dbIntrospection";
 import { classifyTables } from "@/common/classifier";
-import { ForeignKeyReference, TableSchema } from "@/common/interfaces";
+import {
+  fkBucket,
+  ForeignKeyReference,
+  TableSchema,
+} from "@/common/interfaces";
 import { withSession } from "@/lib/session";
 
 async function get(req: NextApiRequest, res: NextApiResponse) {

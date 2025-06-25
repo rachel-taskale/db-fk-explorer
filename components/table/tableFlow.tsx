@@ -25,11 +25,15 @@ import { TableNode } from "./tableNode";
 import { CustomHoverEdge } from "./customEdge";
 import { redirect } from "next/dist/server/api-utils";
 import { Box, Button } from "@chakra-ui/react";
+import { primaryText, secondaryText } from "@/common/styles";
+import { CrowFootNotation } from "@/assets/CrowFootNotation";
 
 interface TableFlowProps {
   tableData: TableSchema[];
   classifiedData: Record<string, fkBucket>;
 }
+
+// First, define custom SVG markers for crow's foot notation
 
 const elk = new ELK();
 
@@ -39,19 +43,22 @@ const elkOptions = {
   "elk.spacing.nodeNode": "80",
 };
 
-const nodeWidth = 200;
-const nodeHeight = 200;
+const nodeWidth = 350;
+const nodeHeight = 350;
 
 const getLayoutedElements = async (
   nodes: Node[],
   edges: Edge[],
   direction: "RIGHT" | "DOWN",
+  classifiedData: Record<string, fkBucket>,
 ): Promise<{ nodes: Node[]; edges: Edge[] }> => {
+  console.log(nodes);
   const elkNodes = nodes.map((node) => ({
     id: node.id,
     width: nodeWidth,
     height: nodeHeight,
   }));
+  console.log(edges);
   const elkEdges = edges.map((edge) => ({
     id: edge.id,
     sources: [edge.source],
@@ -69,6 +76,11 @@ const getLayoutedElements = async (
 
   const positionedNodes = nodes.map((node) => {
     const layoutNode = layout.children?.find((n) => n.id === node.id);
+    // Get all the fields in our classfied list that have connections
+
+    // now go thru all the nodes we've generated and create a list of all them and their positions for comparison
+    // to determine which side to put the node on
+
     return {
       ...node,
       position: {
@@ -80,29 +92,68 @@ const getLayoutedElements = async (
     };
   });
 
+  // const positionedNodesWithReferences = positionedNodes.map((node) => {
+  //   const nodeId = node["id"];
+
+  //   const connectedFields = Object.entries(classifiedData).filter(([key]) =>
+  //     key.includes(nodeId),
+  //   );
+
+  //   const references = positionedNodes.filter((item) =>
+  //     Object.entries(connectedFields).some(([key, fieldData]) => {
+  //       return fieldData[0].includes(item["id"]);
+  //     }),
+  //   );
+  //   node["data"]["references"] = references;
+  //   return { ...node };
+  // });
+  // console.log(positionedNodesWithReferences);
+
   return { nodes: positionedNodes, edges: edges };
 };
-
-const CalculateClosestNodePosition = () => {};
 
 export const TableFlow: React.FC<TableFlowProps> = ({
   tableData,
   classifiedData,
 }) => {
   const router = useRouter();
-  const secondaryText = "#444be5";
-
   const nodeTypes = { tableNode: TableNode };
 
+  const getMarkerTypes = (
+    classification: TableMappingClassification,
+    isNullable?: boolean,
+  ) => {
+    switch (classification) {
+      case TableMappingClassification.OneToMany:
+        return {
+          markerStart: "url(#one)",
+          markerEnd: "url(#many)",
+        };
+      case TableMappingClassification.ManyToOne:
+        return {
+          markerStart: "url(#many)",
+          markerEnd: "url(#one)",
+        };
+      case TableMappingClassification.OneToOne:
+        return {
+          markerStart: "url(#one)",
+          markerEnd: "url(#one)",
+        };
+      case TableMappingClassification.ManyToMany:
+        return {
+          markerStart: "url(#many)",
+          markerEnd: "url(#many)",
+        };
+      default:
+        return {
+          markerStart: undefined,
+          markerEnd: "url(#many)", // default fallback
+        };
+    }
+  };
+  console.log(tableData);
   const baseNodes: Node[] = useMemo(() => {
     if (!Array.isArray(tableData)) return [];
-    const fkFields = new Set<string>();
-    Object.values(classifiedData).forEach((bucket) => {
-      bucket.references.forEach((fk) => {
-        fkFields.add(`${fk.fromTable}.${fk.fromColumn}`);
-        fkFields.add(`${fk.toTable}.${fk.toColumn}`);
-      });
-    });
 
     return tableData.map((table) => ({
       id: table.tableName,
@@ -114,57 +165,47 @@ export const TableFlow: React.FC<TableFlowProps> = ({
       },
     }));
   }, [tableData]);
+  console.log(baseNodes);
 
-  const classifiedStyling = (
-    classification: TableMappingClassification,
-  ): string => {
-    switch (classification) {
-      case TableMappingClassification.ManyToMany:
-        return "red";
-      case TableMappingClassification.OneToMany:
-        return "blue";
-      case TableMappingClassification.ManyToOne:
-        return "green";
-      case TableMappingClassification.OneToOne:
-        return "gray";
-      default:
-        return "#555";
-    }
-  };
   const baseEdges: Edge[] = useMemo(() => {
     if (!classifiedData || typeof classifiedData !== "object") return [];
 
-    return Object.entries(classifiedData).flatMap(([idx, fkBucket]) => {
+    return Object.entries(classifiedData).flatMap(([key, fkBucket]) => {
       const classification = fkBucket.classification;
+      const markers = getMarkerTypes(classification, false);
+      const splitKey = key.split("#"); // [fromTable, fromColumn]
 
-      return fkBucket.references.map((fk) => ({
-        id: `${fk.fromTable}-${fk.fromColumn}-${fk.toTable}-${fk.toColumn}`,
-        source: fk.fromTable,
-        sourceHandle: `${fk.fromColumn}-source`,
-        target: fk.toTable,
-        targetHandle: `${fk.toColumn}-target`,
-        type: "tableNode",
-        data: {
-          label: `${fk.fromTable}.${fk.fromColumn} → ${fk.toTable}.${fk.toColumn}`,
-        },
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-          width: 30,
-          height: 30,
-          color: secondaryText,
-        },
-        style: {
-          stroke: classifiedStyling(classification),
-        },
-      }));
+      return fkBucket.references.map((fk) => {
+        const splitFK = fk.split("#"); // [toTable, toColumn]
+
+        return {
+          id: `${key}-${fk}`,
+          source: splitKey[0],
+          sourceHandle: `${splitKey[1]}-source`,
+          target: splitFK[0],
+          targetHandle: `${splitFK[1]}-target`,
+          type: "custom",
+          data: {
+            label: `${splitKey[0]}.${splitKey[1]} → ${splitFK[0]}.${splitFK[1]}`,
+          },
+          style: {
+            stroke: primaryText,
+            strokeWidth: 1.4,
+            color: primaryText,
+            markerStart: markers.markerStart,
+            markerEnd: markers.markerEnd,
+          },
+        };
+      });
     });
   }, [classifiedData, secondaryText]);
+
   const [nodes, setNodes, onNodesChange] = useNodesState(baseNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(baseEdges);
   useEffect(() => {
     const layoutFlow = async () => {
       const { nodes: layoutedNodes, edges: layoutedEdges } =
-        await getLayoutedElements(baseNodes, baseEdges, "RIGHT");
+        await getLayoutedElements(baseNodes, baseEdges, "DOWN", classifiedData);
 
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
@@ -190,6 +231,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({
 
   return (
     <Box position="relative" width="100%" height="100%">
+      <CrowFootNotation />
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -212,10 +254,9 @@ export const TableFlow: React.FC<TableFlowProps> = ({
         <Background />
       </ReactFlow>
 
-      {/* Zoom controls */}
       <Box
         position="absolute"
-        top="20px"
+        bottom="20px"
         right="20px"
         zIndex="100"
         display="flex"

@@ -25,26 +25,29 @@ export function classifyTables(fkRefs: ForeignKeyReference[]) {
         references: [],
       };
     }
+    console.log(fk);
 
-    outboundMap[fromKey]!.references.push(fk);
+    outboundMap[fromKey]!.references.push(toKey);
   }
+  console.log(outboundMap);
 
   for (const [_, bucket] of Object.entries(outboundMap)) {
     const references = bucket.references;
-
-    const allUniqueTargets = new Set(bucket.references.map((fk) => fk.toTable));
+    // First see if it is a many-to-many connection
+    const allUniqueTargets = new Set(bucket.references.map((fk) => fk));
+    console.log(allUniqueTargets);
     const multipleInboundConnections = bucket.references.filter((i) => {
-      return (inboundCount[`${i.toTable}#${i.toColumn}`] || 0) > 1;
+      return (inboundCount[i] || 0) > 1;
     });
     if (allUniqueTargets.size >= 2 && multipleInboundConnections.length >= 2) {
       bucket.classification = TableMappingClassification.ManyToMany;
+      // If
     } else if (references.length > 1) {
       bucket.classification = TableMappingClassification.OneToMany;
     } else {
       //  At this point we have determined that there is only one item in the reference
       const fk = references[0];
-      const inboundReferencesToTable =
-        inboundCount[`${fk.toTable}#${fk.toColumn}`] || 0;
+      const inboundReferencesToTable = inboundCount[fk] || 0;
       if (inboundReferencesToTable > 1) {
         bucket.classification = TableMappingClassification.ManyToOne;
       } else {
@@ -52,6 +55,7 @@ export function classifyTables(fkRefs: ForeignKeyReference[]) {
       }
     }
   }
+  console.log(outboundMap);
 
   return outboundMap;
 }

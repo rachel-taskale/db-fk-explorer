@@ -27,5 +27,5 @@ export enum TableMappingClassification {
 
 export interface fkBucket {
   classification: TableMappingClassification;
-  references: ForeignKeyReference[];
+  references: string[];
 }

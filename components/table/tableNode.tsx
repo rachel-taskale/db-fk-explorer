@@ -1,17 +1,31 @@
-import { primaryText } from "@/common/styles";
-import { Handle } from "@xyflow/react";
+import { primaryText, secondaryText } from "@/common/styles";
+import { Handle, NodeProps } from "@xyflow/react";
 
 export function TableNode({ data }: NodeProps<TableNodeData>) {
+  const determineClosestNodeSide = (field, connections) => {
+    // We need the point that we have a connection with
+    // If one node is more on the left than on the right then we need to determine the side
+    //
+    // console.log(field);
+    // console.log(connections);
+  };
+
+  const positions = data.fields.map((item) => {
+    // console.log(data.classifiedConnections);
+    if (data.classifiedConnections) {
+      determineClosestNodeSide(item, data.classifiedConnections);
+    }
+  });
+
   return (
     <div
       style={{
-        padding: ".85rem",
+        padding: "1.5rem",
         border: "1px solid #d0d7de",
         borderRadius: "8px",
         background: "#1d1f26",
         color: primaryText,
         width: 240,
-        // maxHeight: 400,
         boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
         fontFamily: "system-ui, sans-serif",
       }}
@@ -19,7 +33,7 @@ export function TableNode({ data }: NodeProps<TableNodeData>) {
       <div
         style={{
           fontWeight: 700,
-          fontSize: "1.25 rem",
+          fontSize: "1.5 rem",
           marginBottom: "1rem",
         }}
       >
@@ -38,7 +52,7 @@ export function TableNode({ data }: NodeProps<TableNodeData>) {
           <div
             key={index}
             style={{
-              fontSize: ".9rem",
+              fontSize: "1rem",
               padding: "4px 0",
               display: "flex",
               justifyContent: "space-between",
@@ -46,14 +60,16 @@ export function TableNode({ data }: NodeProps<TableNodeData>) {
               color: primaryText,
             }}
           >
-            <td>{field}</td>
-            <td>type</td>
+            <div>{field}</div>
+            <div style={{ color: secondaryText }}>type</div>
+
             <Handle
               type="target"
               position="left"
               id={`${field}-target`}
               style={{ top: "50%", transform: "translateY(-50%)" }}
             />
+
             <Handle
               type="source"
               position="right"
