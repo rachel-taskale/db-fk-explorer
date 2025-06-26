@@ -3,8 +3,9 @@ import {
   FKBucket,
   ForeignKeyReference,
   TableMappingClassification,
-  TableSchema,
 } from "./interfaces";
+import { writeDataToDB } from "./db";
+import { classifiedFile } from "./constants";
 
 export function classifyTables(fkRefs: ForeignKeyReference[]) {
   const outboundMap: Record<string, FKBucket> = {};
@@ -55,7 +56,6 @@ export function classifyTables(fkRefs: ForeignKeyReference[]) {
       }
     }
   }
-  console.log(outboundMap);
 
   return outboundMap;
 }

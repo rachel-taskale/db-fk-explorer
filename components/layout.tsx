@@ -1,9 +1,18 @@
 // components/Layout.tsx
-import { Box, Flex, Heading, Link, Text, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Link,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { TableSchema } from "@/common/interfaces";
 import { DBURIInput } from "./dbURIInput";
 import api from "@/lib/axios";
+import router from "next/router";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [tableData, setTableData] = useState<TableSchema[]>([]);
@@ -36,9 +45,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         justifyContent="space-between"
       >
         <VStack align="start" spacing={6}>
-          <Heading size="md" color="#f5f6fa">
-            Schema Explorer
-          </Heading>
+          <Button
+            onClick={() => router.push("/homepage")}
+            variant="ghost"
+            p={0}
+          >
+            <Heading size="md" color="#f5f6fa" m={0}>
+              Schema Explorer
+            </Heading>
+          </Button>
 
           <DBURIInput />
 

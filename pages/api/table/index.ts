@@ -1,15 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createApiHandler } from "../createApiHandler";
-import {
-  createDBClient,
-  sanitizeString,
-  testDBClientConnection,
-  validateDbURI,
-} from "../../../common/client";
-import { introspectDB } from "@/common/dbIntrospection";
-import { classifyTables } from "@/common/classifier";
-import { ForeignKeyReference, TableSchema } from "@/common/interfaces";
+import { sanitizeString, validateDbURI } from "../../../common/client";
 import { withSession } from "@/lib/session";
+import { GetAllTableData } from "@/common/helpers";
 
 async function get(req: NextApiRequest, _: NextApiResponse) {
   try {
@@ -20,44 +13,9 @@ async function get(req: NextApiRequest, _: NextApiResponse) {
     }
 
     const sanitizedURI = sanitizeString(uri);
-
-    const connectionTimeout = 10000;
-    const isValid = await Promise.race([
-      testDBClientConnection(sanitizedURI),
-      new Promise<boolean>((_, reject) =>
-        setTimeout(
-          () => reject(new Error("Connection timeout")),
-          connectionTimeout,
-        ),
-      ),
-    ]);
-
-    if (!isValid) {
-      throw Error("Failed to connect to DB");
-    }
-
-    const client = createDBClient(sanitizedURI);
-
-    const introspectionTimeout = 30000;
-
-    // introspect all the data in the DB
-    const result = await Promise.race([
-      introspectDB(client),
-      new Promise<never>((_, reject) =>
-        setTimeout(
-          () => reject(new Error("Introspection timeout")),
-          introspectionTimeout,
-        ),
-      ),
-    ]);
-
-    const [data, foreignKeyData] = result as [
-      TableSchema[],
-      ForeignKeyReference[],
-    ];
-
-    // create classification model & weighted graph
-    const classifiedData = classifyTables(foreignKeyData);
+    const [data, classifiedData] = await GetAllTableData(sanitizedURI);
+    console.log(data);
+    console.log(classifiedData);
 
     return {
       tableData: data,

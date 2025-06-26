@@ -1,13 +1,33 @@
 // pages/table/[id].tsx
-import { Box, Flex, Heading, IconButton } from "@chakra-ui/react";
+import {
+  Box,
+  Container,
+  Flex,
+  Heading,
+  HStack,
+  IconButton,
+  Text,
+  Stack,
+} from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { GoArrowLeft } from "react-icons/go";
 import { primaryText_200, primaryText_500 } from "@/common/styles";
 import { CustomTable } from "@/components/customTable";
+import api from "@/lib/axios";
+import { useEffect, useState } from "react";
 
 export default function TableDetailPage() {
   const router = useRouter();
   const { id } = router.query;
+  const [tableReferences, setTableReferences] = useState();
+  useEffect(() => {
+    const fetch = async () => {
+      const res = await api.get(`/relatedData/${id}`);
+      console.log(res.data);
+      setTableReferences(res.data);
+    };
+    fetch();
+  }, [id]);
 
   const borderColor = primaryText_200;
   return (
@@ -35,6 +55,45 @@ export default function TableDetailPage() {
           borderColor={borderColor}
         />
       )}
+      {tableReferences && (
+        <div>
+          <Text fontWeight="bold" fontSize="lg" mb={10}>
+            Related Data
+          </Text>
+          <HStack
+            direction="column"
+            align="flex-start"
+            justify="flex-start"
+            width="100%"
+            gap={4}
+          >
+            {tableReferences.map((ref, index) => {
+              const key = ref.split("#");
+
+              return (
+                <Box key={index} width="100%">
+                  <div style={{ display: "flex", columnGap: 20 }}>
+                    <div>
+                      <span>Table:</span> {key[0]}
+                    </div>
+                    <div>
+                      Foreign Key: <span>{key[1]}</span>
+                    </div>
+                  </div>
+                  <CustomTable
+                    width="33vw"
+                    id={ref}
+                    size="sm"
+                    paginationIncrement={10}
+                    borderColor={borderColor}
+                  />
+                </Box>
+              );
+            })}
+          </HStack>
+        </div>
+      )}
+
       {/* Adding related data tables */}
     </Box>
   );

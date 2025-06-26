@@ -10,7 +10,7 @@ export const primaryText_500 = "#F7FAFC50";
 //     300: "#9d9ff7",
 //     400: "#6c6df0",
 //     500: "#444be5",
-
+export const sidebarNav = "#1c1f26";
 export const secondaryText_100 = "#e3e4fd";
 export const secondaryText_200 = "#c2c4fb";
 export const secondaryText_300 = "#9d9ff7";

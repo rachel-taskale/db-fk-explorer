@@ -1,25 +1,42 @@
-import { primaryText_500 } from "@/common/styles";
+import {
+  backgroundColor,
+  primaryText,
+  primaryText_500,
+  sidebarNav,
+} from "@/common/styles";
 import {
   Box,
+  Button,
   Container,
   Flex,
   Heading,
   Spinner,
   Table,
+  Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
 
 interface CustomTableProps {
   id: string | string[];
   size: "sm" | "md" | "lg";
   paginationIncrement: number;
   borderColor: string;
+  width: number;
 }
 
 export const CustomTable = (props: CustomTableProps) => {
   const [tableData, setTableData] = useState<any[]>([]);
   const [columnNames, setColumnNames] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const pageSize = props.paginationIncrement;
+  const totalPages = Math.ceil(tableData.length / pageSize);
+  const paginatedData = tableData.slice(
+    currentPage * pageSize,
+    (currentPage + 1) * pageSize,
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,7 +49,7 @@ export const CustomTable = (props: CustomTableProps) => {
       setLoading(false);
     };
     if (props.id) fetchData();
-  }, []);
+  }, [props.id]);
 
   if (loading) {
     return (
@@ -51,7 +68,7 @@ export const CustomTable = (props: CustomTableProps) => {
   }
 
   return (
-    <div>
+    <Box width={props.width}>
       <Container
         border="1px solid"
         borderColor={props.borderColor}
@@ -76,7 +93,7 @@ export const CustomTable = (props: CustomTableProps) => {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {tableData.map((row, idx) => (
+            {paginatedData.map((row, idx) => (
               <Table.Row key={idx}>
                 {columnNames.map((col) => (
                   <Table.Cell
@@ -96,6 +113,45 @@ export const CustomTable = (props: CustomTableProps) => {
           </Table.Body>
         </Table.Root>
       </Container>
-    </div>
+
+      {/* Pagination Controls */}
+      <Box width="100%" p={2}>
+        <Flex justify="space-between" align="center" width="100%">
+          {/* Empty left spacer to balance center alignment */}
+          <Box width="40px" />
+
+          {/* Centered Page Info */}
+          <Box>
+            <Text fontSize="sm" textAlign="center">
+              Page {currentPage + 1} of {totalPages}
+            </Text>
+          </Box>
+
+          {/* Right-aligned arrows */}
+          <Flex gap={2}>
+            <Button
+              bg="#101217"
+              color={primaryText}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+              isDisabled={currentPage === 0}
+              size="sm"
+            >
+              <BiLeftArrow />
+            </Button>
+            <Button
+              bg="#101217"
+              color={primaryText}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))
+              }
+              isDisabled={currentPage >= totalPages - 1}
+              size="sm"
+            >
+              <BiRightArrow />
+            </Button>
+          </Flex>
+        </Flex>
+      </Box>
+    </Box>
   );
 };

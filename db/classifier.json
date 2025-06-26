@@ -1,0 +1,58 @@
+{
+  "artist#artist_id": {
+    "classification": "ONE_TO_ONE",
+    "references": [
+      "album#artist_id"
+    ]
+  },
+  "employee#employee_id": {
+    "classification": "ONE_TO_MANY",
+    "references": [
+      "employee#reports_to",
+      "customer#support_rep_id"
+    ]
+  },
+  "customer#customer_id": {
+    "classification": "ONE_TO_ONE",
+    "references": [
+      "invoice#customer_id"
+    ]
+  },
+  "invoice#invoice_id": {
+    "classification": "ONE_TO_ONE",
+    "references": [
+      "invoice_line#invoice_id"
+    ]
+  },
+  "track#track_id": {
+    "classification": "ONE_TO_MANY",
+    "references": [
+      "invoice_line#track_id",
+      "playlist_track#track_id"
+    ]
+  },
+  "album#album_id": {
+    "classification": "ONE_TO_ONE",
+    "references": [
+      "track#album_id"
+    ]
+  },
+  "genre#genre_id": {
+    "classification": "ONE_TO_ONE",
+    "references": [
+      "track#genre_id"
+    ]
+  },
+  "media_type#media_type_id": {
+    "classification": "ONE_TO_ONE",
+    "references": [
+      "track#media_type_id"
+    ]
+  },
+  "playlist#playlist_id": {
+    "classification": "ONE_TO_ONE",
+    "references": [
+      "playlist_track#playlist_id"
+    ]
+  }
+}

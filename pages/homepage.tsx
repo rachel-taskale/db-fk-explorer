@@ -20,8 +20,6 @@ export default function Homepage() {
     fetch();
   }, []);
 
-  console.log(tableData);
-
   if (!tableData || tableData.length === 0) {
     return (
       <Flex align="center" justify="center" height="100%">
