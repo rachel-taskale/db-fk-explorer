@@ -1,13 +1,13 @@
 import { json } from "stream/consumers";
 import {
-  fkBucket,
+  FKBucket,
   ForeignKeyReference,
   TableMappingClassification,
   TableSchema,
 } from "./interfaces";
 
 export function classifyTables(fkRefs: ForeignKeyReference[]) {
-  const outboundMap: Record<string, fkBucket> = {};
+  const outboundMap: Record<string, FKBucket> = {};
   const inboundCount: Record<string, number> = {};
 
   // Group FKs by source and count inbound FKs
@@ -41,7 +41,7 @@ export function classifyTables(fkRefs: ForeignKeyReference[]) {
     });
     if (allUniqueTargets.size >= 2 && multipleInboundConnections.length >= 2) {
       bucket.classification = TableMappingClassification.ManyToMany;
-      // If
+      // If we more than one reference then that means one to many relationship
     } else if (references.length > 1) {
       bucket.classification = TableMappingClassification.OneToMany;
     } else {

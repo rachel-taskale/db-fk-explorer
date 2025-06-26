@@ -17,12 +17,12 @@ import "@xyflow/react/dist/style.css";
 
 import { useRouter } from "next/router";
 import {
-  fkBucket,
+  FKBucket,
   TableMappingClassification,
   TableSchema,
 } from "../../common/interfaces";
 import { TableNode } from "./tableNode";
-import { CustomHoverEdge } from "./customEdge";
+import { TableEdge } from "./tableEdge";
 import { redirect } from "next/dist/server/api-utils";
 import { Box, Button } from "@chakra-ui/react";
 import { primaryText, secondaryText } from "@/common/styles";
@@ -30,7 +30,7 @@ import { CrowFootNotation } from "@/assets/CrowFootNotation";
 
 interface TableFlowProps {
   tableData: TableSchema[];
-  classifiedData: Record<string, fkBucket>;
+  classifiedData: Record<string, FKBucket>;
 }
 
 // First, define custom SVG markers for crow's foot notation
@@ -44,7 +44,7 @@ const getLayoutedElements = async (
   nodes: Node[],
   edges: Edge[],
   direction: "RIGHT" | "DOWN" | "UP" | "LEFT",
-  classifiedData: Record<string, fkBucket>,
+  classifiedData: Record<string, FKBucket>,
 ): Promise<{ nodes: Node[]; edges: Edge[] }> => {
   const elkOptions = {
     "elk.algorithm": "layered",
@@ -174,12 +174,12 @@ export const TableFlow: React.FC<TableFlowProps> = ({
   const baseEdges: Edge[] = useMemo(() => {
     if (!classifiedData || typeof classifiedData !== "object") return [];
 
-    return Object.entries(classifiedData).flatMap(([key, fkBucket]) => {
-      const classification = fkBucket.classification;
+    return Object.entries(classifiedData).flatMap(([key, FKBucket]) => {
+      const classification = FKBucket.classification;
       const markers = getMarkerTypes(classification, false);
       const splitKey = key.split("#"); // [fromTable, fromColumn]
 
-      return fkBucket.references.map((fk) => {
+      return FKBucket.references.map((fk) => {
         const splitFK = fk.split("#"); // [toTable, toColumn]
 
         return {
@@ -191,6 +191,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({
           type: "custom",
           data: {
             label: `${splitKey[0]}.${splitKey[1]} → ${splitFK[0]}.${splitFK[1]}`,
+            classifiedConnection: classifiedData[key].classification,
           },
           style: {
             stroke: primaryText,
@@ -225,7 +226,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({
 
   const edgeTypes = useMemo(
     () => ({
-      custom: CustomHoverEdge,
+      custom: TableEdge,
     }),
     [],
   );

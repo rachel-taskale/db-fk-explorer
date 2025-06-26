@@ -19,6 +19,7 @@ export default function Homepage() {
     };
     fetch();
   }, []);
+
   console.log(tableData);
 
   if (!tableData || tableData.length === 0) {

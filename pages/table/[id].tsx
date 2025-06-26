@@ -9,54 +9,24 @@ import {
   Spinner,
   Table,
   Container,
+  Button,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { CgSearch } from "react-icons/cg";
-import { primaryText, primaryText_200 } from "@/common/styles";
-
-interface Field {
-  name: string;
-  // ... other props
-}
+import {
+  primaryText,
+  primaryText_200,
+  primaryText_500,
+  secondaryText,
+} from "@/common/styles";
+import { CustomTable } from "@/components/customTable";
 
 export default function TableDetailPage() {
   const router = useRouter();
   const { id } = router.query;
 
-  const [tableData, setTableData] = useState<any[]>([]);
-  const [columnNames, setColumnNames] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch(`/api/table/${id}`);
-      const data = await res.json();
-      setTableData(data.rows || []);
-      if (data.fields) {
-        setColumnNames(data.fields.map((item: Field) => item.name));
-      }
-      setLoading(false);
-    };
-    if (id) fetchData();
-  }, [id]);
-
-  if (loading) {
-    return (
-      <Flex justify="center" align="center" minH="80vh">
-        <Spinner size="xl" />
-      </Flex>
-    );
-  }
-
-  if (tableData.length === 0) {
-    return (
-      <Box p={8}>
-        <Heading size="md">No data found</Heading>
-      </Box>
-    );
-  }
   const borderColor = primaryText_200;
   return (
     <Box p={8}>
@@ -69,54 +39,21 @@ export default function TableDetailPage() {
           >
             <GoArrowLeft />
           </IconButton>
-          <Heading size="lg">Table: {id}</Heading>
+          <Heading size="lg">
+            <span style={{ color: primaryText_500 }}>Table:</span> {id}
+          </Heading>
         </Flex>
       </Flex>
-
-      <Container
-        border="1px solid"
-        borderColor={borderColor}
-        borderRadius="md"
-        overflow="scroll"
-      >
-        <Table.Root variant="striped" colorScheme="gray" size="md">
-          <Table.Header>
-            <Table.Row>
-              {columnNames.map((col) => (
-                <Table.ColumnHeader
-                  key={col}
-                  fontSize="xs"
-                  textTransform="uppercase"
-                  fontWeight="bold"
-                  color="gray.500"
-                  borderColor={borderColor}
-                >
-                  {col}
-                </Table.ColumnHeader>
-              ))}
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {tableData.map((row, idx) => (
-              <Table.Row key={idx}>
-                {columnNames.map((col) => (
-                  <Table.Cell
-                    key={col}
-                    fontFamily="mono"
-                    fontSize="sm"
-                    borderColor={borderColor}
-                    whiteSpace="nowrap"
-                    overflow="hidden"
-                    textOverflow="ellipsis"
-                  >
-                    {row[col]?.toString() || ""}
-                  </Table.Cell>
-                ))}
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table.Root>
-      </Container>
+      {/* Main Table */}
+      {id && (
+        <CustomTable
+          id={id}
+          size="sm"
+          paginationIncrement={10}
+          borderColor={borderColor}
+        />
+      )}
+      {/* Adding related data tables */}
     </Box>
   );
 }

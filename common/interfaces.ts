@@ -25,19 +25,26 @@ export enum TableMappingClassification {
   ManyToMany = "MANY_TO_MANY",
 }
 
-export interface fkBucket {
+export interface FKBucket {
   classification: TableMappingClassification;
   references: string[];
 }
 
-export enum position {
+export enum Position {
   top = "TOP",
   bottom = "BOTTOM",
   right = "RIGHT",
   left = "LEFT",
 }
 
-export interface nodePositions {
-  sourceNode: position;
-  targetNode: position;
+export interface NodePositions {
+  sourceNode: Position;
+  targetNode: Position;
+}
+
+export interface TableData {
+  name: string;
+  data: any;
+  fields: any;
+  relatedData?: string[];
 }

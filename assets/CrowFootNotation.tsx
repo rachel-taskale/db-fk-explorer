@@ -1,3 +1,9 @@
+import {
+  secondaryText_300,
+  secondaryText_400,
+  secondaryText_500,
+} from "@/common/styles";
+
 export const CrowFootNotation = () => (
   <svg
     style={{
@@ -20,7 +26,7 @@ export const CrowFootNotation = () => (
       >
         <path
           d="M16,3 L6,12 L16,21 M6,12 L16,12"
-          stroke="currentColor"
+          stroke={secondaryText_300}
           strokeWidth="1.5"
           fill="none"
         />

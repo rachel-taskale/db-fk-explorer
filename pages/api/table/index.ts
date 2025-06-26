@@ -9,7 +9,7 @@ import {
 import { introspectDB } from "@/common/dbIntrospection";
 import { classifyTables } from "@/common/classifier";
 import {
-  fkBucket,
+  FKBucket,
   ForeignKeyReference,
   TableSchema,
 } from "@/common/interfaces";

@@ -1,4 +1,4 @@
-import { FieldSchema, nodePositions, position } from "@/common/interfaces";
+import { FieldSchema, NodePositions, Position } from "@/common/interfaces";
 import {
   primaryText,
   primaryText_100,

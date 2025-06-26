@@ -1,4 +1,9 @@
-import { primaryText } from "../../common/styles";
+import { TableMappingClassification } from "@/common/interfaces";
+import {
+  primaryText,
+  secondaryText_300,
+  secondaryText_400,
+} from "../../common/styles";
 import {
   EdgeLabelRenderer,
   getBezierPath,
@@ -7,7 +12,7 @@ import {
   getStraightPath,
 } from "@xyflow/react";
 
-type CustomHoverEdgeProps = {
+type TableEdgeProps = {
   id: string;
   sourceX: number;
   sourceY: number;
@@ -18,7 +23,7 @@ type CustomHoverEdgeProps = {
   data?: Record<string, string>;
 };
 
-export const CustomHoverEdge = ({
+export const TableEdge = ({
   id,
   sourceX,
   sourceY,
@@ -27,7 +32,7 @@ export const CustomHoverEdge = ({
   style,
   markerEnd,
   data,
-}: CustomHoverEdgeProps) => {
+}: TableEdgeProps) => {
   const [edgePath] = getBezierPath({
     sourceX,
     sourceY,
@@ -35,17 +40,18 @@ export const CustomHoverEdge = ({
     targetY,
   });
 
-  // ✅ Calculate center of the edge
   const [labelX, labelY] = getEdgeCenter({
     sourceX,
     sourceY,
     targetX,
     targetY,
   });
-
+  const strokeColor =
+    data && data["classifiedConnection"] === TableMappingClassification.OneToOne
+      ? primaryText
+      : secondaryText_400;
   return (
     <>
-      {/* Invisible fat path for easier hover/click */}
       <path
         d={edgePath}
         stroke="transparent"
@@ -54,21 +60,19 @@ export const CustomHoverEdge = ({
         style={{ pointerEvents: "stroke", zIndex: 1000 }}
       />
 
-      {/* Actual visible edge */}
       <path
         id={id}
         d={edgePath}
         fill="none"
-        style={{ ...style, strokeLinecap: "round" }}
+        style={{ ...style, stroke: strokeColor, strokeLinecap: "round" }}
         markerEnd={markerEnd}
       />
 
-      {/* Midpoint label */}
       <EdgeLabelRenderer>
         <div
           style={{
             position: "absolute",
-            zIndex: 1000, // ⬅️ bring label on top of nodes
+            zIndex: 1000,
             transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
             fontSize: 10,
             background: "#1a1a1a",
