@@ -1,7 +1,6 @@
 import { useMemo, useCallback, useEffect } from "react";
 import ELK from "elkjs/lib/elk.bundled.js";
 import {
-  ReactFlowProvider,
   useReactFlow,
   ReactFlow,
   Background,
@@ -10,7 +9,6 @@ import {
   useNodesState,
   useEdgesState,
   ConnectionMode,
-  MarkerType,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
@@ -23,7 +21,6 @@ import {
 } from "../../common/interfaces";
 import { TableNode } from "./tableNode";
 import { TableEdge } from "./tableEdge";
-import { redirect } from "next/dist/server/api-utils";
 import { Box, Button } from "@chakra-ui/react";
 import { primaryText, secondaryText } from "@/common/styles";
 import { CrowFootNotation } from "@/assets/CrowFootNotation";
@@ -44,7 +41,6 @@ const getLayoutedElements = async (
   nodes: Node[],
   edges: Edge[],
   direction: "RIGHT" | "DOWN" | "UP" | "LEFT",
-  classifiedData: Record<string, FKBucket>,
 ): Promise<{ nodes: Node[]; edges: Edge[] }> => {
   const elkOptions = {
     "elk.algorithm": "layered",
@@ -93,8 +89,6 @@ const getLayoutedElements = async (
   }
   const layout = await elk.layout(layoutGraph);
   const { sourcePosition, targetPosition } = getPortPositions(direction);
-  console.log(sourcePosition);
-  console.log(targetPosition);
   const positionedNodes = nodes.map((node) => {
     const layoutNode = layout.children?.find((n) => n.id === node.id);
     // Get all the fields in our classfied list that have connections
@@ -124,10 +118,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({
   const nodeTypes = { tableNode: TableNode };
   const direction = "RIGHT";
 
-  const getMarkerTypes = (
-    classification: TableMappingClassification,
-    isNullable?: boolean,
-  ) => {
+  const getMarkerTypes = (classification: TableMappingClassification) => {
     switch (classification) {
       case TableMappingClassification.OneToMany:
         return {
@@ -176,7 +167,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({
 
     return Object.entries(classifiedData).flatMap(([key, FKBucket]) => {
       const classification = FKBucket.classification;
-      const markers = getMarkerTypes(classification, false);
+      const markers = getMarkerTypes(classification);
       const splitKey = key.split("#"); // [fromTable, fromColumn]
 
       return FKBucket.references.map((fk) => {
@@ -210,12 +201,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({
   useEffect(() => {
     const layoutFlow = async () => {
       const { nodes: layoutedNodes, edges: layoutedEdges } =
-        await getLayoutedElements(
-          baseNodes,
-          baseEdges,
-          direction,
-          classifiedData,
-        );
+        await getLayoutedElements(baseNodes, baseEdges, direction);
 
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);

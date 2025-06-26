@@ -5,17 +5,13 @@ import { withSession } from "@/lib/session";
 import {
   FKBucket,
   ForeignKeyReference,
-  TableData,
   TableSchema,
 } from "@/common/interfaces";
-import { Pool } from "pg";
 import { classifyTables } from "@/common/classifier";
 import { introspectDB } from "@/common/dbIntrospection";
-import Id from "./row/[id]";
 
 async function getRelatedData(
   classifiedData: Record<string, FKBucket>,
-  client: Pool,
   id: string | string[],
 ) {
   const relatedTables = Object.entries(classifiedData).flatMap(
@@ -26,18 +22,6 @@ async function getRelatedData(
       return [];
     },
   );
-  // const allRelatedData: TableData[] = await Promise.all(
-  //   relatedTables.map(async (i) => {
-  //     const [tableName] = i.split("#");
-  //     const getTableDataQuery = `SELECT * FROM "${tableName}" LIMIT $1`;
-  //     const result = await client.query(getTableDataQuery, [10]);
-  //     return {
-  //       name: tableName,
-  //       data: result.rows,
-  //       fields: result.fields,
-  //     };
-  //   }),
-  // );
   return relatedTables;
 }
 
@@ -102,7 +86,7 @@ export async function get(req: NextApiRequest, res: NextApiResponse) {
     throw Error("Invalid table name");
   }
   const classifiedData = await helper(dbURI);
-  const relatedData = await getRelatedData(classifiedData, client, id);
+  const relatedData = await getRelatedData(classifiedData, id);
 
   try {
     const query = `SELECT * FROM "${id}" LIMIT 100`;

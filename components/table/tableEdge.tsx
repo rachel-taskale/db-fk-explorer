@@ -1,16 +1,6 @@
 import { TableMappingClassification } from "@/common/interfaces";
-import {
-  primaryText,
-  secondaryText_300,
-  secondaryText_400,
-} from "../../common/styles";
-import {
-  EdgeLabelRenderer,
-  getBezierPath,
-  getEdgeCenter,
-  getSmoothStepPath,
-  getStraightPath,
-} from "@xyflow/react";
+import { primaryText, secondaryText_400 } from "../../common/styles";
+import { EdgeLabelRenderer, getBezierPath, getEdgeCenter } from "@xyflow/react";
 
 type TableEdgeProps = {
   id: string;

@@ -2,24 +2,18 @@
 import { Box, Flex, Heading, Link, Text, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { TableSchema } from "@/common/interfaces";
-import { BiSolidCircle } from "react-icons/bi";
-import { IoIosArrowDown } from "react-icons/io";
 import { DBURIInput } from "./dbURIInput";
 import api from "@/lib/axios";
-import { successGreen } from "@/common/styles";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [tableData, setTableData] = useState<TableSchema[]>([]);
-  const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const result = await api.get("/table");
         setTableData(result.data["tableData"]);
-      } catch {
-        setIsConnected(false);
-      }
+      } catch {}
     };
     fetchData();
   }, []);

@@ -1,26 +1,8 @@
 // pages/table/[id].tsx
-import {
-  Box,
-  Flex,
-  Heading,
-  IconButton,
-  Input,
-  InputGroup,
-  Spinner,
-  Table,
-  Container,
-  Button,
-} from "@chakra-ui/react";
+import { Box, Flex, Heading, IconButton } from "@chakra-ui/react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
-import { CgSearch } from "react-icons/cg";
-import {
-  primaryText,
-  primaryText_200,
-  primaryText_500,
-  secondaryText,
-} from "@/common/styles";
+import { primaryText_200, primaryText_500 } from "@/common/styles";
 import { CustomTable } from "@/components/customTable";
 
 export default function TableDetailPage() {

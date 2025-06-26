@@ -8,14 +8,10 @@ import {
 } from "../../../common/client";
 import { introspectDB } from "@/common/dbIntrospection";
 import { classifyTables } from "@/common/classifier";
-import {
-  FKBucket,
-  ForeignKeyReference,
-  TableSchema,
-} from "@/common/interfaces";
+import { ForeignKeyReference, TableSchema } from "@/common/interfaces";
 import { withSession } from "@/lib/session";
 
-async function get(req: NextApiRequest, res: NextApiResponse) {
+async function get(req: NextApiRequest, _: NextApiResponse) {
   try {
     const uri = req.session.dbURI;
 

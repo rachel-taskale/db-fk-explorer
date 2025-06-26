@@ -3,7 +3,7 @@ import { createDBClient } from "@/common/client";
 import { createApiHandler } from "../../createApiHandler";
 import { withSession } from "@/lib/session";
 
-export async function get(req: NextApiRequest, res: NextApiResponse) {
+export async function get(req: NextApiRequest, _: NextApiResponse) {
   const dbURI = req.session.dbURI;
   if (!dbURI) {
     throw Error("No DB URI found");
@@ -22,12 +22,10 @@ export async function get(req: NextApiRequest, res: NextApiResponse) {
   if (!isValidIdentifier) {
     throw Error("Invalid table name");
   }
-  console.log("name: " + id);
 
   try {
     const query = `SELECT * FROM "${id}" LIMIT 100`;
     const result = await client.query(query);
-    console.log(result);
     return result;
   } catch (err) {
     console.error("DB query failed:", err);

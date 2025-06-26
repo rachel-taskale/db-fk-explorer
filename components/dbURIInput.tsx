@@ -18,7 +18,6 @@ export const DBURIInput = () => {
     try {
       await api.post("/session/set-dburi", { dbURI });
       setIsConnected(true);
-      //   retreiveNodeData();
     } catch (err: any) {
       console.error("Failed to set dbURI:", err);
       setIsConnected(false);

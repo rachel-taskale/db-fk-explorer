@@ -1,11 +1,6 @@
-import { FieldSchema, NodePositions, Position } from "@/common/interfaces";
-import {
-  primaryText,
-  primaryText_100,
-  primaryText_200,
-  secondaryText,
-} from "@/common/styles";
-import { Box, Stack } from "@chakra-ui/react";
+import { FieldSchema } from "@/common/interfaces";
+import { primaryText, primaryText_200, secondaryText } from "@/common/styles";
+import { Stack } from "@chakra-ui/react";
 import { Handle, NodeProps } from "@xyflow/react";
 
 export function TableNode({ data }: NodeProps<TableNodeData>) {

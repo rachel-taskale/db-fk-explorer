@@ -1,4 +1,3 @@
-import { TableData } from "@/common/interfaces";
 import { primaryText_500 } from "@/common/styles";
 import {
   Box,
