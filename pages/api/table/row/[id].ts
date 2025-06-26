@@ -24,7 +24,7 @@ export async function get(req: NextApiRequest, _: NextApiResponse) {
   }
 
   try {
-    const query = `SELECT * FROM "${id}" LIMIT 100`;
+    const query = `SELECT * FROM "${id}"`;
     const result = await client.query(query);
     return result;
   } catch (err) {

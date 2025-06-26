@@ -14,8 +14,6 @@ async function get(req: NextApiRequest, _: NextApiResponse) {
 
     const sanitizedURI = sanitizeString(uri);
     const [data, classifiedData] = await GetAllTableData(sanitizedURI);
-    console.log(data);
-    console.log(classifiedData);
 
     return {
       tableData: data,

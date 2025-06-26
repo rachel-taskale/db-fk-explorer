@@ -51,11 +51,11 @@ export default function TableDetailPage() {
         <CustomTable
           id={id}
           size="sm"
-          paginationIncrement={10}
+          paginationIncrement={30}
           borderColor={borderColor}
         />
       )}
-      {tableReferences && (
+      {tableReferences && Object.keys(tableReferences).length > 0 && (
         <div>
           <Text fontWeight="bold" fontSize="lg" mb={10}>
             Related Data
@@ -84,8 +84,9 @@ export default function TableDetailPage() {
                     width="33vw"
                     id={ref}
                     size="sm"
-                    paginationIncrement={10}
+                    paginationIncrement={20}
                     borderColor={borderColor}
+                    isRelatedTable={true}
                   />
                 </Box>
               );

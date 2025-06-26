@@ -1,7 +1,9 @@
 import {
+  background,
   backgroundColor,
   primaryText,
   primaryText_500,
+  secondaryText,
   sidebarNav,
 } from "@/common/styles";
 import {
@@ -14,8 +16,10 @@ import {
   Table,
   Text,
 } from "@chakra-ui/react";
+import router from "next/router";
 import { useEffect, useState } from "react";
 import { BiLeftArrow, BiRightArrow } from "react-icons/bi";
+import { GoArrowLeft, GoArrowRight } from "react-icons/go";
 
 interface CustomTableProps {
   id: string | string[];
@@ -23,6 +27,7 @@ interface CustomTableProps {
   paginationIncrement: number;
   borderColor: string;
   width: number;
+  isRelatedTable: boolean;
 }
 
 export const CustomTable = (props: CustomTableProps) => {
@@ -112,6 +117,18 @@ export const CustomTable = (props: CustomTableProps) => {
             ))}
           </Table.Body>
         </Table.Root>
+        {props.isRelatedTable && (
+          <Flex alignContent="end" justifyContent="end">
+            <Button
+              bg={background}
+              color={secondaryText}
+              onClick={() => router.push(`/table/${props.id}`)}
+            >
+              More data
+              <GoArrowRight />
+            </Button>
+          </Flex>
+        )}
       </Container>
 
       {/* Pagination Controls */}

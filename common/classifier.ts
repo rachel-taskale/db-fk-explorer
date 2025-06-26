@@ -1,11 +1,8 @@
-import { json } from "stream/consumers";
 import {
   FKBucket,
   ForeignKeyReference,
   TableMappingClassification,
 } from "./interfaces";
-import { writeDataToDB } from "./db";
-import { classifiedFile } from "./constants";
 
 export function classifyTables(fkRefs: ForeignKeyReference[]) {
   const outboundMap: Record<string, FKBucket> = {};

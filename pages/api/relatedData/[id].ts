@@ -21,7 +21,6 @@ async function getRelatedData(
 }
 
 export async function get(req: NextApiRequest, _: NextApiResponse) {
-  const dbURI = req.session.dbURI;
   const { id } = req.query;
   const classifiedData = readDataFromDB(classifiedFile);
   return getRelatedData(classifiedData, id);
