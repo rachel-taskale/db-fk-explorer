@@ -1,37 +1,82 @@
-// TableNode.jsx
-import { Handle } from "@xyflow/react";
+import { FieldSchema } from "@/common/interfaces";
+import { primaryText, primaryText_200, secondaryText } from "@/common/styles";
+import { Stack } from "@chakra-ui/react";
+import { Handle, NodeProps } from "@xyflow/react";
 
-export function TableNode({ data }) {
+export function TableNode({ data }: NodeProps<TableNodeData>) {
   return (
     <div
       style={{
-        padding: 8,
-        border: "1px solid #ccc",
-        borderRadius: 6,
-        background: "white",
-        color: "black",
+        padding: "1.5rem",
+        border: "1px solid #d0d7de",
+        borderRadius: "8px",
+        background: "#1d1f26",
+        color: primaryText,
+        width: 300,
+        maxHeight: 350,
+        boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+        fontFamily: "system-ui, sans-serif",
       }}
     >
-      <strong>{data.name}</strong>
-      <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-        {data.fields.map((field, index) => (
-          <li key={index}>
-            {field}
-            {/* Input handle for foreign keys */}
-            <Handle
-              type="target"
-              position="left"
-              id={`${field}-target`}
-              style={{ top: 20 + index * 20 }}
-            />
-            <Handle
-              type="source"
-              position="right"
-              id={`${field}-source`}
-              style={{ top: 20 + index * 20 }}
-            />
-          </li>
-        ))}
+      <div
+        style={{
+          fontWeight: 700,
+          fontSize: "1.5 rem",
+          marginBottom: "1rem",
+        }}
+      >
+        {data.name}
+      </div>
+      <ul
+        style={{
+          listStyle: "none",
+          paddingLeft: 0,
+          margin: 0,
+          maxHeight: 250,
+          overflow: "scroll",
+        }}
+      >
+        <Stack divideY="1px" divideColor={primaryText_200} width="100%">
+          {Object.entries(data.fields as Record<string, FieldSchema>).map(
+            ([key, value]: [string, FieldSchema], index) => (
+              <div
+                key={index}
+                style={{
+                  fontSize: "1rem",
+                  padding: "4px 0 4px 0",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  color: primaryText,
+                }}
+              >
+                <div>{key}</div>
+                <div
+                  style={{
+                    color: secondaryText,
+                    flexWrap: "wrap",
+                    maxWidth: "50%",
+                    textAlign: "right",
+                  }}
+                >
+                  {value.type}
+                </div>
+
+                <Handle
+                  type="target"
+                  position={data["targetPosition"]}
+                  id={`${key}-target`}
+                />
+
+                <Handle
+                  type="source"
+                  position={data["sourcePosition"]}
+                  id={`${key}-source`}
+                />
+              </div>
+            ),
+          )}
+        </Stack>
       </ul>
     </div>
   );

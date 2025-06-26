@@ -7,20 +7,13 @@ import {
   validateDbURI,
 } from "../../../common/client";
 import { introspectDB } from "@/common/dbIntrospection";
+import { classifyTables } from "@/common/classifier";
+import { ForeignKeyReference, TableSchema } from "@/common/interfaces";
+import { withSession } from "@/lib/session";
 
-async function post(req: NextApiRequest, res: NextApiResponse) {
+async function get(req: NextApiRequest, _: NextApiResponse) {
   try {
-    console.log(req.body);
-
-    if (!req.body || typeof req.body !== "object") {
-      throw new Error("Invalid request body");
-    }
-
-    const { uri } = req.body;
-
-    if (typeof uri !== "string") {
-      throw new Error("`uri` must be a string");
-    }
+    const uri = req.session.dbURI;
 
     if (!validateDbURI(uri)) {
       throw Error("Invalid database URI format");
@@ -46,9 +39,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
     const client = createDBClient(sanitizedURI);
 
     const introspectionTimeout = 30000;
-    const data = await Promise.race([
+
+    // introspect all the data in the DB
+    const result = await Promise.race([
       introspectDB(client),
-      new Promise((_, reject) =>
+      new Promise<never>((_, reject) =>
         setTimeout(
           () => reject(new Error("Introspection timeout")),
           introspectionTimeout,
@@ -56,8 +51,18 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
       ),
     ]);
 
-    console.log(data);
-    return data;
+    const [data, foreignKeyData] = result as [
+      TableSchema[],
+      ForeignKeyReference[],
+    ];
+
+    // create classification model & weighted graph
+    const classifiedData = classifyTables(foreignKeyData);
+
+    return {
+      tableData: data,
+      classifiedData: classifiedData,
+    };
   } catch (error) {
     console.error("Database API error:", error);
 
@@ -71,11 +76,11 @@ async function post(req: NextApiRequest, res: NextApiResponse) {
 
 const handlers = {
   POST: async (req: NextApiRequest, res: NextApiResponse) => {
-    return await post(req, res);
+    throw Error("Endpoint does not exist");
   },
   GET: async (req: NextApiRequest, res: NextApiResponse) => {
-    throw Error("Endpoint does not exist");
+    return await get(req, res);
   },
 };
 
-export default createApiHandler(handlers);
+export default withSession(createApiHandler(handlers));
