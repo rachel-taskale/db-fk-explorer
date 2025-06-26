@@ -1,5 +1,11 @@
-import { nodePositions, position } from "@/common/interfaces";
-import { primaryText, secondaryText } from "@/common/styles";
+import { FieldSchema, nodePositions, position } from "@/common/interfaces";
+import {
+  primaryText,
+  primaryText_100,
+  primaryText_200,
+  secondaryText,
+} from "@/common/styles";
+import { Box, Stack } from "@chakra-ui/react";
 import { Handle, NodeProps } from "@xyflow/react";
 
 export function TableNode({ data }: NodeProps<TableNodeData>) {
@@ -12,7 +18,7 @@ export function TableNode({ data }: NodeProps<TableNodeData>) {
         background: "#1d1f26",
         color: primaryText,
         width: 300,
-        height: 350,
+        maxHeight: 350,
         boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
         fontFamily: "system-ui, sans-serif",
       }}
@@ -35,34 +41,47 @@ export function TableNode({ data }: NodeProps<TableNodeData>) {
           overflow: "scroll",
         }}
       >
-        {data.fields.map((field, index) => (
-          <div
-            key={index}
-            style={{
-              fontSize: "1rem",
-              padding: "4px 0 4px 0",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              color: primaryText,
-            }}
-          >
-            <div>{field}</div>
-            <div style={{ color: secondaryText }}>type</div>
+        <Stack divideY="1px" divideColor={primaryText_200} width="100%">
+          {Object.entries(data.fields as Record<string, FieldSchema>).map(
+            ([key, value]: [string, FieldSchema], index) => (
+              <div
+                key={index}
+                style={{
+                  fontSize: "1rem",
+                  padding: "4px 0 4px 0",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  color: primaryText,
+                }}
+              >
+                <div>{key}</div>
+                <div
+                  style={{
+                    color: secondaryText,
+                    flexWrap: "wrap",
+                    maxWidth: "50%",
+                    textAlign: "right",
+                  }}
+                >
+                  {value.type}
+                </div>
 
-            <Handle
-              type="target"
-              position={data["targetPosition"]}
-              id={`${field}-target`}
-            />
+                <Handle
+                  type="target"
+                  position={data["targetPosition"]}
+                  id={`${key}-target`}
+                />
 
-            <Handle
-              type="source"
-              position={data["sourcePosition"]}
-              id={`${field}-source`}
-            />
-          </div>
-        ))}
+                <Handle
+                  type="source"
+                  position={data["sourcePosition"]}
+                  id={`${key}-source`}
+                />
+              </div>
+            ),
+          )}
+        </Stack>
       </ul>
     </div>
   );

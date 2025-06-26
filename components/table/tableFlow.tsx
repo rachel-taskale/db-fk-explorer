@@ -166,7 +166,7 @@ export const TableFlow: React.FC<TableFlowProps> = ({
       position: { x: 0, y: 0 },
       data: {
         name: table.tableName,
-        fields: Object.keys(table.fields),
+        fields: table.fields,
       },
     }));
   }, [tableData]);

@@ -1,97 +1,122 @@
 // pages/table/[id].tsx
-import { Input, InputGroup } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Heading,
+  IconButton,
+  Input,
+  InputGroup,
+  Spinner,
+  Table,
+  Container,
+} from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { BiLeftArrow } from "react-icons/bi";
-import { CgSearch } from "react-icons/cg";
 import { GoArrowLeft } from "react-icons/go";
+import { CgSearch } from "react-icons/cg";
+import { primaryText, primaryText_200 } from "@/common/styles";
+
+interface Field {
+  name: string;
+  // ... other props
+}
 
 export default function TableDetailPage() {
   const router = useRouter();
   const { id } = router.query;
 
   const [tableData, setTableData] = useState<any[]>([]);
+  const [columnNames, setColumnNames] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch(`/api/table/${id}`);
       const data = await res.json();
-      setTableData(data.fields);
+      setTableData(data.rows || []);
+      if (data.fields) {
+        setColumnNames(data.fields.map((item: Field) => item.name));
+      }
       setLoading(false);
     };
-    fetchData();
+    if (id) fetchData();
   }, [id]);
 
-  if (loading) return <div>Loading...</div>;
-  if (!tableData || tableData.length === 0) return <div>No data found</div>;
+  if (loading) {
+    return (
+      <Flex justify="center" align="center" minH="80vh">
+        <Spinner size="xl" />
+      </Flex>
+    );
+  }
 
-  const columnNames = Object.keys(tableData[0]);
-
+  if (tableData.length === 0) {
+    return (
+      <Box p={8}>
+        <Heading size="md">No data found</Heading>
+      </Box>
+    );
+  }
+  const borderColor = primaryText_200;
   return (
-    <div style={{ padding: "2rem" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "1rem",
-        }}
+    <Box p={8}>
+      <Flex justify="space-between" mb={4} align="center">
+        <Flex align="center" gap={3}>
+          <IconButton
+            aria-label="Go back"
+            variant="ghost"
+            onClick={() => router.back()}
+          >
+            <GoArrowLeft />
+          </IconButton>
+          <Heading size="lg">Table: {id}</Heading>
+        </Flex>
+      </Flex>
+
+      <Container
+        border="1px solid"
+        borderColor={borderColor}
+        borderRadius="md"
+        overflow="scroll"
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-          }}
-        >
-          <GoArrowLeft onClick={() => router.back()} />
-          <h1 style={{ fontSize: "1.5rem", margin: 0 }}>Table: {id}</h1>
-        </div>
-        <div style={{ width: "50vw", display: "flex" }}>
-          <InputGroup startElement={<CgSearch />}>
-            <Input variant="flushed" color="GrayText"></Input>
-          </InputGroup>
-        </div>
-      </div>
-      <table style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-            {columnNames.map((col) => (
-              <th
-                key={col}
-                style={{
-                  border: "1px solid #F7FAFC50",
-                  padding: "8px",
-                  background: "#F7FAFC08",
-                  textAlign: "left",
-                }}
-              >
-                {col}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {tableData.map((row, idx) => (
-            <tr key={idx}>
-              {/* <span onClick={() => router.push(`/table/${idx}`)}> */}
+        <Table.Root variant="striped" colorScheme="gray" size="md">
+          <Table.Header>
+            <Table.Row>
               {columnNames.map((col) => (
-                <td
+                <Table.ColumnHeader
                   key={col}
-                  style={{
-                    border: ".5px solid #F7FAFC50",
-                    padding: "8px",
-                    fontFamily: "monospace",
-                  }}
+                  fontSize="xs"
+                  textTransform="uppercase"
+                  fontWeight="bold"
+                  color="gray.500"
+                  borderColor={borderColor}
                 >
-                  {row[col]?.toString() || ""}
-                </td>
+                  {col}
+                </Table.ColumnHeader>
               ))}
-              {/* </span> */}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {tableData.map((row, idx) => (
+              <Table.Row key={idx}>
+                {columnNames.map((col) => (
+                  <Table.Cell
+                    key={col}
+                    fontFamily="mono"
+                    fontSize="sm"
+                    borderColor={borderColor}
+                    whiteSpace="nowrap"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                  >
+                    {row[col]?.toString() || ""}
+                  </Table.Cell>
+                ))}
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table.Root>
+      </Container>
+    </Box>
   );
 }
